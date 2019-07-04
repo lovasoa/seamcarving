@@ -19,8 +19,8 @@ impl Direction {
 struct Pos(u32, u32);
 
 impl Pos {
-    fn in_image<IMG: GenericImage>(&self, img: &IMG) -> bool {
-        self.0 < img.width() && self.1 < img.height()
+    fn before(&self, max: &Pos) -> bool {
+        self.0 < max.0 && self.1 < max.1
     }
     fn successors<'a>(&'a self, dir: Direction) -> impl Iterator<Item=Pos> + 'a {
         let orth = dir.other();
@@ -41,6 +41,10 @@ impl Pos {
             Direction::Y => self.1,
         }
     }
+}
+
+fn max_pos<IMG: GenericImage>(img: &IMG) -> Pos {
+    Pos(img.width(), img.height())
 }
 
 impl Add<Pos> for Pos {
@@ -87,10 +91,11 @@ impl From<Direction> for Pos {
 fn energy_fn<IMG: GenericImage>(img: &IMG, pos: &Pos) -> u32 {
     use image::Pixel;
     use num_traits::cast::ToPrimitive;
+    let last_pos = &max_pos(img);
     Direction::all().iter()
         .map(|&dir| -> u32{
             let mut next = *pos + dir.into();
-            if !next.in_image(img) { next = *pos }
+            if !next.before(last_pos) { next = *pos }
             let prev = *pos - dir.into();
             let p1 = img.get_pixel(next.0, next.1);
             let p2 = img.get_pixel(prev.0, prev.1);
@@ -111,11 +116,16 @@ struct Carved<IMG: GenericImage> {
 
 impl<IMG: GenericImage> Carved<IMG> {
     fn remove_seam(&mut self, seam: &Vec<Pos>, dir: Direction) {
-        seam.iter().for_each(|Pos(x, y)| {
-            (*x..self.img.width() - 1).for_each(|i| {
-                let p = self.img.get_pixel(i + 1, *y);
-                self.img.put_pixel(i, *y, p);
-            });
+        let last_pos = &max_pos(&self.img);
+        seam.iter().for_each(|&pos| {
+            std::iter::successors(
+                Some((pos, pos + Pos::from(dir))),
+                |&(_, p)| Some((p, p + Pos::from(dir))),
+            ).take_while(|(_, p)| p.before(last_pos))
+                .for_each(|(p1, p2)| {
+                    let pix = self.img.get_pixel(p2.0, p2.1);
+                    self.img.put_pixel(p1.0, p1.1, pix);
+                });
         });
         self.removed += 1;
     }
@@ -123,7 +133,8 @@ impl<IMG: GenericImage> Carved<IMG> {
 
 pub fn carve<IMG: GenericImage>(img: &mut IMG) {
     let dir = Direction::X;
-    let _seam: Option<(Vec<Option<Pos>>, u32)> = dijkstra(
+    let last_pos = &max_pos(img);
+    let (seams, _cost): (Vec<Option<Pos>>, u32) = dijkstra(
         &None,
         |maybe_pos: &Option<Pos>| -> Vec<_>{
             match maybe_pos {
@@ -133,7 +144,7 @@ pub fn carve<IMG: GenericImage>(img: &mut IMG) {
                         .collect(),
                 Some(pos) =>
                     pos.successors(dir)
-                        .filter(|pos| pos.in_image(img))
+                        .filter(|pos| pos.before(last_pos))
                         .map(|pos| (Some(pos), energy_fn(img, &pos)))
                         .collect(),
             }
@@ -141,7 +152,8 @@ pub fn carve<IMG: GenericImage>(img: &mut IMG) {
         |maybe_pos: &Option<Pos>| {
             maybe_pos.map_or(false, |Pos(_x, y)| y == img.height())
         },
-    );
+    ).unwrap();
+    let seams: Vec<Pos> = seams.into_iter().skip(1).collect::<Option<_>>().unwrap();
 }
 
 #[cfg(test)]
