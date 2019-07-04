@@ -1,0 +1,10 @@
+[package]
+name = "seamcarving"
+version = "0.1.0"
+authors = ["Ophir LOJKINE <ophir.lojkine@auto-grid.com>"]
+edition = "2018"
+
+[dependencies]
+image = "0.21"
+pathfinding = "1.1"
+num-traits = "0.2"
