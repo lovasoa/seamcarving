@@ -142,7 +142,8 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
             .zip(seam)
             .for_each(|(aliases, pos)| {
                 let n = pos.component(orth);
-                aliases[n as usize..].rotate_left(1)
+                let end = &mut aliases[n as usize..];
+                if end.len() > 0 { end.rotate_left(1) }
             });
         self.removed += 1;
     }
@@ -168,7 +169,7 @@ impl<'a, IMG: GenericImageView> GenericImageView for Carved<'a, IMG> {
     type InnerImageView = IMG::InnerImageView;
 
     fn dimensions(&self) -> (u32, u32) {
-        let p = max_pos(self.img) - Pos::from(self.dir) * self.removed;
+        let p = max_pos(self.img) - Pos::from(self.dir.other()) * self.removed;
         p.into()
     }
 
@@ -192,6 +193,7 @@ fn carve_one<IMG: GenericImageView>(
     dir: Direction,
 ) {
     let last_pos = &max_pos(carved);
+    let end_coord = last_pos.component(dir) - 1;
     let (seam, _cost): (Vec<Option<Pos>>, u32) = dijkstra(
         &None,
         |maybe_pos: &Option<Pos>| -> Vec<_>{
@@ -208,9 +210,11 @@ fn carve_one<IMG: GenericImageView>(
             }
         },
         |maybe_pos: &Option<Pos>| {
-            maybe_pos.map_or(false, |p| p.component(dir) == last_pos.component(dir))
+            maybe_pos.map_or(false, |p|
+                p.component(dir) == end_coord,
+            )
         },
-    ).unwrap();
+    ).expect("No seam found. This is a bug in seamcarving");
     let seam: Vec<Pos> = seam.into_iter().skip(1).collect::<Option<_>>().unwrap();
     carved.remove_seam(&seam);
 }
@@ -232,8 +236,9 @@ pub fn resize<IMG: GenericImage>(
     height: u32,
 ) -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>>
     where <IMG as GenericImageView>::Pixel: 'static {
-    let mut carved_x = carve(img, Direction::Y, width);
-    let carved_y = carve(&mut carved_x, Direction::X, height);
+    let Pos(to_remove_x, to_remove_y) = max_pos(img) - Pos(width, height);
+    let mut carved_x = carve(img, Direction::Y, to_remove_x);
+    let carved_y = carve(&mut carved_x, Direction::X, to_remove_y);
     carved_y.finalize()
 }
 
