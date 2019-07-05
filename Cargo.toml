@@ -1,7 +1,12 @@
 [package]
 name = "seamcarving"
+description = "Content-aware image resizing using the seam carving algorithm. Allows changing the aspect ratio of an image without distorting its contents."
 version = "0.0.1"
 authors = ["Ophir LOJKINE <ophir.lojkine@auto-grid.com>"]
+license = "LGPL-3.0-or-later"
+documentation = "https://docs.rs/seamcarving"
+homepage = "https://github.com/lovasoa/seamcarving#seamcarving"
+repository = "https://github.com/lovasoa/seamcarving.git"
 edition = "2018"
 
 [dependencies]
@@ -13,6 +18,9 @@ quickcheck = "0.8"
 [dev-dependencies]
 quickcheck = "0.8"
 criterion = "0.2"
+
+[badges]
+travis-ci = { repository = "lovasoa/seamcarving" }
 
 [[bench]]
 name = "benchmark"
