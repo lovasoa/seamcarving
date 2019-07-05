@@ -6,12 +6,14 @@ use std::ops::{Add, Sub, Mul};
 pub enum Direction { X, Y }
 
 impl Direction {
+    #[inline(always)]
     pub fn other(&self) -> Direction {
         match self {
             Direction::X => Direction::Y,
             Direction::Y => Direction::X,
         }
     }
+    #[inline(always)]
     pub fn all() -> [Direction; 2] { [Direction::X, Direction::Y] }
 }
 
@@ -19,6 +21,7 @@ impl Direction {
 struct Pos(u32, u32);
 
 impl Pos {
+    #[inline(always)]
     fn before(&self, max: &Pos) -> bool {
         self.0 < max.0 && self.1 < max.1
     }
@@ -35,6 +38,7 @@ impl Pos {
             x.map(|x| orth_vec * x + (*self + dir_vec) * dir_vec)
         })
     }
+    #[inline(always)]
     fn component(&self, d: Direction) -> u32 {
         match d {
             Direction::X => self.0,
@@ -48,12 +52,14 @@ fn max_pos<IMG: GenericImageView>(img: &IMG) -> Pos {
 }
 
 impl From<Pos> for (u32, u32) {
+    #[inline(always)]
     fn from(Pos(x, y): Pos) -> Self { (x, y) }
 }
 
 impl Add<Pos> for Pos {
     type Output = Pos;
 
+    #[inline(always)]
     fn add(self, rhs: Pos) -> Self::Output {
         Pos(self.0 + rhs.0, self.1 + rhs.1)
     }
@@ -62,6 +68,7 @@ impl Add<Pos> for Pos {
 impl Sub<Pos> for Pos {
     type Output = Pos;
 
+    #[inline(always)]
     fn sub(self, rhs: Pos) -> Self::Output {
         Pos(self.0.saturating_sub(rhs.0), self.1.saturating_sub(rhs.1))
     }
@@ -70,6 +77,7 @@ impl Sub<Pos> for Pos {
 impl Mul<u32> for Pos {
     type Output = Pos;
 
+    #[inline(always)]
     fn mul(self, rhs: u32) -> Self::Output {
         Pos(self.0 * rhs, self.1 * rhs)
     }
@@ -78,12 +86,14 @@ impl Mul<u32> for Pos {
 impl Mul<Pos> for Pos {
     type Output = Pos;
 
+    #[inline(always)]
     fn mul(self, rhs: Pos) -> Self::Output {
         Pos(self.0 * rhs.0, self.1 * rhs.1)
     }
 }
 
 impl From<Direction> for Pos {
+    #[inline(always)]
     fn from(d: Direction) -> Self {
         match d {
             Direction::X => Pos(1, 0),
@@ -93,6 +103,7 @@ impl From<Direction> for Pos {
 }
 
 impl From<(u32, u32)> for Pos {
+    #[inline(always)]
     fn from((x, y): (u32, u32)) -> Self {
         Pos(x, y)
     }
@@ -148,6 +159,7 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
         self.removed += 1;
     }
     /// Given a position in the carved image, return a position in the original
+    #[inline(always)]
     fn transform_pos(&self, pos: Pos) -> Pos {
         let i = pos.component(self.dir);
         let j = pos.component(self.dir.other());
@@ -168,16 +180,19 @@ impl<'a, IMG: GenericImageView> GenericImageView for Carved<'a, IMG> {
     type Pixel = IMG::Pixel;
     type InnerImageView = IMG::InnerImageView;
 
+    #[inline(always)]
     fn dimensions(&self) -> (u32, u32) {
         let p = max_pos(self.img) - Pos::from(self.dir.other()) * self.removed;
         p.into()
     }
 
+    #[inline(always)]
     fn bounds(&self) -> (u32, u32, u32, u32) {
         let (w, h) = self.dimensions();
         (0, 0, w, h)
     }
 
+    #[inline(always)]
     fn get_pixel(&self, x: u32, y: u32) -> Self::Pixel {
         let Pos(u, v) = self.transform_pos(Pos(x, y));
         self.img.get_pixel(u, v)
