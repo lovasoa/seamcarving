@@ -8,3 +8,4 @@ A rust library for
 Original | Resized
 --- | ---
 ![waterfall original](./examples/waterfall.png) | ![waterfall resized with liquid rescaling](./examples/waterfall_resized.png) 
+![butterfly original](./examples/butterfly.png) | ![butterfly resized with liquid rescaling](./examples/butterfly_resized.png) 
