@@ -121,9 +121,10 @@ fn energy_fn<IMG: GenericImageView>(img: &IMG, pos: &Pos) -> u32 {
             let p2 = img.get_pixel(prev.0, prev.1);
             p1.channels().iter().zip(p2.channels())
                 .map(|(&a, &b)| {
-                    let a = a.to_i16().unwrap_or(i16::max_value());
-                    let b = b.to_i16().unwrap_or(i16::max_value());
-                    ((a - b).abs() as u32).pow(2)
+                    let a = a.to_u32().unwrap_or(u32::max_value());
+                    let b = b.to_u32().unwrap_or(u32::max_value());
+                    let diff = if a > b { a - b } else { b - a };
+                    diff * diff
                 }).sum()
         }).sum()
 }
