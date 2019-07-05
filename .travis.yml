@@ -1,0 +1,25 @@
+language: rust
+sudo: false
+cache: cargo
+matrix:
+  include:
+  - rust: stable
+  - rust: nightly
+    env: DO_BENCHMARKS=1 ALLOW_WARNINGS=1
+  - rust: stable
+    env: TARGET=wasm32-unknown-unknown SKIP_TESTS=1
+  - rust: 1.36.0
+    env: SKIP_TESTS=1
+  allow_failures:
+  - rust: nightly
+  fast_finish: true
+script: bash -x ci/script.sh
+deploy:
+  provider: cargo
+  token:
+    secure: VLBBKjQ3ArYXO28x315uHOc9A088ipFqFtIjtZJIK56b2CsjOVdA/s4xx6ovX5vhCovHcOTS8gAwOQiEAoj8iwSL9ZUHIi9n25DQTd/F1zrLmDPbMZVyeiH9HrOGdYyleNDGzGNvtI+MYpAWYUY1RNfu57JiwG6o9bpDQD/ido+KM3/sMrMq+i+ZK6pe8C99ppFq1XOC8iHsD6vm0G2zOiwek4AiFFFMLCLfCmmY6G23KCcGzpIoYq47Pfo49jD9LJq+kVqpS6+Q3VwoANNC6SoIo+ERLOt8mCy9qa4ICZz+W/A7W8ulBWvhWXX996JQ92S6Ltf9V4+RRedgkn2W6B58mPVnCtPapQtH/dZpj2wwiMXvLn+E2NHTeygJUqwx2JT5U40a0f/1TE51w2vg2NadzY2c0h9hKEDm8TjBOowwWW1VEFPc6s7/LtOovX8OQlaBp8fVGk6jXwz5tpXjgg1J5kqHk6SWC9TFihRwxHl/M6cTNN9g0fg992B1l7wv3H65qpec4m2UgDO+/dVRh2Ow80wklJGYlUGNO2J2McEsSbkPttZTqXW6gZAdGqmt2rf/20mSsmq7k78xqQ7meKAThY77EjPPKues5uCifohNZ0AgutOBdIodiPOFK5SOTXuNXON/yP7LWSnoLIF6vHl+bOtrDLnLROwNIVmF9x4=
+  on:
+    tags: true
+notifications:
+  email:
+    on_success: never
