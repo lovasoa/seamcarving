@@ -199,7 +199,7 @@ fn carve_one<IMG: GenericImageView>(
         |maybe_pos: &Option<Pos>| -> Vec<_>{
             match maybe_pos {
                 None =>
-                    (0..Pos::from(carved.dimensions()).component(dir))
+                    (0..Pos::from(carved.dimensions()).component(dir.other()))
                         .map(|x| (Some(Pos::from(dir.other()) * x), 0))
                         .collect(),
                 Some(pos) =>
@@ -244,8 +244,40 @@ pub fn resize<IMG: GenericImage>(
 
 #[cfg(test)]
 mod tests {
+    use image::{GrayImage, ImageBuffer, Luma};
+    use crate::{resize, energy_fn, Pos};
+
     #[test]
-    fn size_is_correct() {
-        assert_eq!(2 + 2, 4);
+    fn energy_fn_correct() {
+        let img = GrayImage::from_raw(3, 2, vec![
+            3, 1, 4,
+            1, 5, 9,
+        ]).unwrap();
+        let energy = ImageBuffer::from_fn(3, 2, |x, y| {
+            Luma([energy_fn(&img, &Pos(x, y))])
+        });
+        let expected = vec![
+            (2 * 2 + 2 * 2), (1 * 1 + 4 * 4), (5 * 5 + 3 * 3),
+            (2 * 2 + 4 * 4), (4 * 4 + 8 * 8), (5 * 5 + 4 * 4),
+        ];
+        assert_eq!(energy.into_raw(), expected);
+    }
+
+    #[test]
+    fn removes_the_right_seam() {
+        let raw = vec![
+            3, 1, 4, 0, 0, 0, 1, 5,
+            9, 2, 6, 0, 0, 0, 5, 3,
+            5, 8, 0, 0, 0, 9, 7, 9,
+        ];
+        let expected = vec![
+            3, 1, 4, 0, 0, 1, 5,
+            9, 2, 6, 0, 0, 5, 3,
+            5, 8, 0, 0, 9, 7, 9,
+        ];
+        let img = GrayImage::from_raw(8, 3, raw).unwrap();
+        let resized = resize(&img, 7, 3);
+        assert_eq!(resized.dimensions(), (7, 3));
+        assert_eq!(resized.into_raw(), expected);
     }
 }

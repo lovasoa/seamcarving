@@ -1,6 +1,6 @@
 [package]
 name = "seamcarving"
-version = "0.1.0"
+version = "0.0.1"
 authors = ["Ophir LOJKINE <ophir.lojkine@auto-grid.com>"]
 edition = "2018"
 
@@ -8,4 +8,7 @@ edition = "2018"
 image = "0.21"
 pathfinding = "1.1"
 num-traits = "0.2"
+quickcheck = "0.8"
+
+[dev-dependencies]
 quickcheck = "0.8"
