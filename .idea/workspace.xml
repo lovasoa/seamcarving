@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fdf587d7-6427-48ec-8d69-d6eb3ed0b69c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/benches/benchmark.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/benches/benchmark.rs" beforeDir="false" afterPath="$PROJECT_DIR$/benches/benchmark.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -24,6 +24,19 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/lib.rs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="423">
+              <caret line="166" column="27" selection-start-line="166" selection-start-column="27" selection-end-line="166" selection-end-column="27" />
+              <folding>
+                <element signature="e#586#587#0" expanded="true" />
+                <element signature="e#633#634#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/benches/input.png">
           <provider selected="true" editor-type-id="images" />
         </entry>
@@ -31,8 +44,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Cargo.toml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
+            <state relative-caret-position="264">
+              <caret line="11" selection-start-line="11" selection-end-line="11" />
             </state>
           </provider>
         </entry>
@@ -40,8 +53,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/benches/benchmark.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="864">
-              <caret line="36" selection-start-line="36" selection-end-line="36" />
+            <state relative-caret-position="912">
+              <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
             </state>
           </provider>
         </entry>
@@ -83,8 +96,8 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/ci/script.sh" />
         <option value="$PROJECT_DIR$/.travis.yml" />
-        <option value="$PROJECT_DIR$/src/lib.rs" />
         <option value="$PROJECT_DIR$/Cargo.toml" />
+        <option value="$PROJECT_DIR$/src/lib.rs" />
         <option value="$PROJECT_DIR$/benches/benchmark.rs" />
       </list>
     </option>
@@ -313,13 +326,31 @@
       <option name="project" value="LOCAL" />
       <updated>1562340378476</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Add a benchmark">
+      <created>1562344512461</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1562344512461</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Add a benchmark image">
+      <created>1562344550519</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1562344550519</updated>
+    </task>
+    <task id="LOCAL-00013" summary="[performance] Inline critical functions">
+      <created>1562344799989</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1562344799989</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="test - 2019.07.05 at 15h 55m 12s.xml">
-      <configuration name="test" configurationId="CargoCommandRunConfiguration" />
-    </history-entry>
     <history-entry file="test - 2019.07.05 at 15h 55m 25s.xml">
       <configuration name="test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
@@ -347,6 +378,9 @@
     <history-entry file="test - 2019.07.05 at 17h 50m 01s.xml">
       <configuration name="test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
+    <history-entry file="test - 2019.07.05 at 19h 14m 42s.xml">
+      <configuration name="test" configurationId="CargoCommandRunConfiguration" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="1680" y="-834" width="1080" height="1920" extended-state="0" />
@@ -361,13 +395,13 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.29164392" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.29164392" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.31403604" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.31403604" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="10" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -392,7 +426,10 @@
     <MESSAGE value="Add another example" />
     <MESSAGE value="Update example" />
     <MESSAGE value="Add travis CI" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add travis CI" />
+    <MESSAGE value="Add a benchmark" />
+    <MESSAGE value="Add a benchmark image" />
+    <MESSAGE value="[performance] Inline critical functions" />
+    <option name="LAST_COMMIT_MESSAGE" value="[performance] Inline critical functions" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/.cargo/registry/src/github.com-1ecc6299db9ec823/pathfinding-1.1.12/src/directed/dijkstra.rs">
@@ -503,23 +540,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/lib.rs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="222">
-          <caret line="248" selection-start-line="248" selection-end-line="248" />
-          <folding>
-            <element signature="e#546#547#0" expanded="true" />
-            <element signature="e#593#594#0" expanded="true" />
-            <element signature="e#1306#1307#0" expanded="true" />
-            <element signature="e#1343#1344#0" expanded="true" />
-            <element signature="e#2311#2312#0" expanded="true" />
-            <element signature="e#2331#2332#0" expanded="true" />
-            <element signature="e#5295#5296#0" expanded="true" />
-            <element signature="e#5326#5327#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/benches/input-0.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
@@ -559,15 +579,26 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Cargo.toml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
+        <state relative-caret-position="264">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lib.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="423">
+          <caret line="166" column="27" selection-start-line="166" selection-start-column="27" selection-end-line="166" selection-end-column="27" />
+          <folding>
+            <element signature="e#586#587#0" expanded="true" />
+            <element signature="e#633#634#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/benches/benchmark.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="864">
-          <caret line="36" selection-start-line="36" selection-end-line="36" />
+        <state relative-caret-position="912">
+          <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
         </state>
       </provider>
     </entry>

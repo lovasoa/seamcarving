@@ -133,7 +133,7 @@ struct Carved<'a, IMG: GenericImageView>
     img: &'a IMG,
     dir: Direction,
     removed: u32,
-    pos_aliases: Vec<Vec<u32>>,
+    pos_aliases: Vec<u32>,
 }
 
 impl<'a, IMG: GenericImageView> Carved<'a, IMG>
@@ -142,14 +142,16 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
         let last_pos = max_pos(img);
         let max_dir = last_pos.component(dir);
         let max_orth = last_pos.component(dir.other());
-        let pos_aliases = (0..max_dir)
-            .map(|_| (0..max_orth).collect())
+
+        let pos_aliases = (0..max_dir * max_orth)
+            .map(|i| i % max_orth)
             .collect();
         Carved { img, dir, removed: 0, pos_aliases }
     }
     fn remove_seam(&mut self, seam: &Vec<Pos>) {
         let orth = self.dir.other();
-        self.pos_aliases.iter_mut()
+        let max_orth = max_pos(self.img).component(orth);
+        self.pos_aliases.chunks_exact_mut(max_orth as usize)
             .zip(seam)
             .for_each(|(aliases, pos)| {
                 let n = pos.component(orth);
@@ -161,11 +163,13 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
     /// Given a position in the carved image, return a position in the original
     #[inline(always)]
     fn transform_pos(&self, pos: Pos) -> Pos {
+        let orth = self.dir.other();
+        let max_orth = max_pos(self.img).component(orth);
         let i = pos.component(self.dir);
-        let j = pos.component(self.dir.other());
+        let j = pos.component(orth);
         let u = Pos::from(self.dir);
-        let v = Pos::from(self.dir.other());
-        let j_alias = self.pos_aliases[i as usize][j as usize];
+        let v = Pos::from(orth);
+        let j_alias = self.pos_aliases[(i * max_orth + j) as usize];
         u * i + v * j_alias
     }
     fn finalize(self) -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>> {
