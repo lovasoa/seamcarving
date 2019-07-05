@@ -12,3 +12,8 @@ quickcheck = "0.8"
 
 [dev-dependencies]
 quickcheck = "0.8"
+criterion = "0.2"
+
+[[bench]]
+name = "benchmark"
+harness = false

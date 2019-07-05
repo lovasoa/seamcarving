@@ -5,10 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fdf587d7-6427-48ec-8d69-d6eb3ed0b69c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/bashsupport_project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.travis.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ci/script.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/benches/benchmark.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -25,43 +24,24 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/lib.rs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="881">
-              <caret line="259" column="37" selection-start-line="259" selection-start-column="37" selection-end-line="259" selection-end-column="37" />
-              <folding>
-                <element signature="e#546#547#0" expanded="true" />
-                <element signature="e#593#594#0" expanded="true" />
-                <element signature="e#1306#1307#0" expanded="true" />
-                <element signature="e#1343#1344#0" expanded="true" />
-                <element signature="e#2311#2312#0" expanded="true" />
-                <element signature="e#2331#2332#0" expanded="true" />
-                <element signature="e#5295#5296#0" expanded="true" />
-                <element signature="e#5326#5327#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/waterfall_resized.png">
+        <entry file="file://$PROJECT_DIR$/benches/input.png">
           <provider selected="true" editor-type-id="images" />
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.travis.yml">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Cargo.toml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="12" column="17" lean-forward="true" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="17" />
+            <state relative-caret-position="408">
+              <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ci/script.sh">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/benches/benchmark.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="504">
-              <caret line="21" column="13" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
+            <state relative-caret-position="864">
+              <caret line="36" selection-start-line="36" selection-end-line="36" />
             </state>
           </provider>
         </entry>
@@ -69,48 +49,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/examples/resize.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="20" column="6" selection-start-line="20" selection-start-column="6" selection-end-line="20" selection-end-column="6" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/waterfall.png">
-          <provider selected="true" editor-type-id="images" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/README.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="240">
-                <caret line="10" column="25" selection-start-line="10" selection-start-column="25" selection-end-line="10" selection-end-column="25" />
-              </first_editor>
-              <second_editor />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/.cargo/registry/src/github.com-1ecc6299db9ec823/image-0.21.2/src/image.rs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="87">
-              <caret line="616" column="10" selection-start-line="616" selection-start-column="10" selection-end-line="616" selection-end-column="10" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Cargo.toml">
-          <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="312">
-              <caret line="13" selection-start-line="13" selection-end-line="13" />
+              <caret line="13" column="27" selection-start-line="13" selection-end-line="14" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -128,11 +80,12 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/examples/resize.rs" />
-        <option value="$PROJECT_DIR$/Cargo.toml" />
-        <option value="$PROJECT_DIR$/src/lib.rs" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/ci/script.sh" />
         <option value="$PROJECT_DIR$/.travis.yml" />
+        <option value="$PROJECT_DIR$/src/lib.rs" />
+        <option value="$PROJECT_DIR$/Cargo.toml" />
+        <option value="$PROJECT_DIR$/benches/benchmark.rs" />
       </list>
     </option>
   </component>
@@ -162,7 +115,17 @@
             <path>
               <item name="seamcarving" type="b2602c69:ProjectViewProjectNode" />
               <item name="seamcarving" type="462c0819:PsiDirectoryNode" />
+              <item name="benches" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="seamcarving" type="b2602c69:ProjectViewProjectNode" />
+              <item name="seamcarving" type="462c0819:PsiDirectoryNode" />
               <item name="ci" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="seamcarving" type="b2602c69:ProjectViewProjectNode" />
+              <item name="seamcarving" type="462c0819:PsiDirectoryNode" />
+              <item name="examples" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="seamcarving" type="b2602c69:ProjectViewProjectNode" />
@@ -200,7 +163,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Cargo Command.Run resize">
+  <component name="RunManager" selected="Cargo Command.bench">
     <configuration name="Check" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="channel" value="DEFAULT" />
       <option name="command" value="check " />
@@ -211,9 +174,29 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="Expand benchmark" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="channel" value="DEFAULT" />
+      <option name="command" value="expand --bench benchmark --color=always --theme=GitHub --tests" />
+      <option name="allFeatures" value="false" />
+      <option name="nocapture" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <configuration name="Run resize" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="channel" value="DEFAULT" />
       <option name="command" value="run --release --package seamcarving --example resize examples/waterfall.png 600 400" />
+      <option name="allFeatures" value="false" />
+      <option name="nocapture" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="bench" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="channel" value="DEFAULT" />
+      <option name="command" value="bench" />
       <option name="allFeatures" value="false" />
       <option name="nocapture" value="false" />
       <option name="backtrace" value="SHORT" />
@@ -234,10 +217,13 @@
     <list>
       <item itemvalue="Cargo Command.Check" />
       <item itemvalue="Cargo Command.test" />
+      <item itemvalue="Cargo Command.bench" />
       <item itemvalue="Cargo Command.Run resize" />
+      <item itemvalue="Cargo Command.Expand benchmark" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo Command.Expand benchmark" />
         <item itemvalue="Cargo Command.Run resize" />
       </list>
     </recent_temporary>
@@ -320,7 +306,14 @@
       <option name="project" value="LOCAL" />
       <updated>1562339237297</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Add travis CI">
+      <created>1562340378476</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1562340378476</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -351,6 +344,9 @@
     <history-entry file="test - 2019.07.05 at 16h 34m 39s.xml">
       <configuration name="test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
+    <history-entry file="test - 2019.07.05 at 17h 50m 01s.xml">
+      <configuration name="test" configurationId="CargoCommandRunConfiguration" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="1680" y="-834" width="1080" height="1920" extended-state="0" />
@@ -365,13 +361,13 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.29164392" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.29164392" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.31403604" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.31403604" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="10" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -395,7 +391,8 @@
     <MESSAGE value="Add README" />
     <MESSAGE value="Add another example" />
     <MESSAGE value="Update example" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update example" />
+    <MESSAGE value="Add travis CI" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add travis CI" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/.cargo/registry/src/github.com-1ecc6299db9ec823/pathfinding-1.1.12/src/directed/dijkstra.rs">
@@ -462,41 +459,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/resize.rs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="20" column="6" selection-start-line="20" selection-start-column="6" selection-end-line="20" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Cargo.toml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="13" selection-start-line="13" selection-end-line="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.cargo/registry/src/github.com-1ecc6299db9ec823/image-0.21.2/src/color.rs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="421">
           <caret line="226" selection-start-line="226" selection-end-line="226" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/lib.rs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="881">
-          <caret line="259" column="37" selection-start-line="259" selection-start-column="37" selection-end-line="259" selection-end-column="37" />
-          <folding>
-            <element signature="e#546#547#0" expanded="true" />
-            <element signature="e#593#594#0" expanded="true" />
-            <element signature="e#1306#1307#0" expanded="true" />
-            <element signature="e#1343#1344#0" expanded="true" />
-            <element signature="e#2311#2312#0" expanded="true" />
-            <element signature="e#2331#2332#0" expanded="true" />
-            <element signature="e#5295#5296#0" expanded="true" />
-            <element signature="e#5326#5327#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -526,7 +492,82 @@
     <entry file="file://$PROJECT_DIR$/.travis.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
-          <caret line="12" column="17" lean-forward="true" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="17" />
+          <caret line="12" column="17" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/src/libtest/lib.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="207" column="11" selection-start-line="207" selection-start-column="11" selection-end-line="207" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lib.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="222">
+          <caret line="248" selection-start-line="248" selection-end-line="248" />
+          <folding>
+            <element signature="e#546#547#0" expanded="true" />
+            <element signature="e#593#594#0" expanded="true" />
+            <element signature="e#1306#1307#0" expanded="true" />
+            <element signature="e#1343#1344#0" expanded="true" />
+            <element signature="e#2311#2312#0" expanded="true" />
+            <element signature="e#2331#2332#0" expanded="true" />
+            <element signature="e#5295#5296#0" expanded="true" />
+            <element signature="e#5326#5327#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/benches/input-0.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/benches/input-11.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/benches/input-14.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/benches/input-17.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/benches/input-13.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/benches/input-9.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/benches/input-6.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/benches/input-4.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/benches/input-2.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/benches/input.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/resize.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="312">
+          <caret line="13" column="27" selection-start-line="13" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Cargo.toml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/benches/benchmark.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="864">
+          <caret line="36" selection-start-line="36" selection-end-line="36" />
         </state>
       </provider>
     </entry>
