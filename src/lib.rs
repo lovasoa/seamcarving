@@ -28,25 +28,10 @@ impl Pos {
     fn before(self, max: Pos) -> bool {
         self.0 < max.0 && self.1 < max.1
     }
-    fn successors(self, dir: Direction) -> impl Iterator<Item=Pos> {
-        let orth = dir.other();
-        let orth_projection = self.component(orth);
-        let dir_vec = Pos::from(dir);
-        let orth_vec = Pos::from(orth);
-        vec![
-            orth_projection.checked_sub(1),
-            Some(orth_projection),
-            orth_projection.checked_add(1)
-        ].into_iter().filter_map(move |x| {
-            x.map(|x| orth_vec * x + (self + dir_vec) * dir_vec)
-        })
-    }
-    #[inline(always)]
-    fn component(self, d: Direction) -> u32 {
-        match d {
-            Direction::X => self.0,
-            Direction::Y => self.1,
-        }
+    fn successors(self) -> impl Iterator<Item=Pos> {
+        let Pos(x, y) = self;
+        vec![x.checked_sub(1), Some(x), x.checked_add(1)].into_iter()
+            .filter_map(move |x| x.map(|x| Pos(x, y + 1)))
     }
 }
 
@@ -218,7 +203,7 @@ fn carve_one<IMG: GenericImageView>(carved: &mut Carved<IMG>) {
                         energy_fn(carved, Pos(x, 0))
                     )).collect(),
                 Some(pos) =>
-                    pos.successors(Direction::Y)
+                    pos.successors()
                         .filter(|Pos(x, y)| *x < w && *y < h)
                         .map(|pos| (Some(pos), energy_fn(carved, pos)))
                         .collect(),
