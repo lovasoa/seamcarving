@@ -1,5 +1,6 @@
+use std::ops::{Index, IndexMut};
+
 use crate::Pos;
-use std::ops::Index;
 
 pub(crate) struct Matrix<T> {
     width: usize,
@@ -33,5 +34,13 @@ impl<T> Index<Pos> for Matrix<T> {
     fn index(&self, pos: Pos) -> &Self::Output {
         let (x, y) = (pos.0 as usize, pos.1 as usize);
         &self.contents[x + y * self.width]
+    }
+}
+
+impl<T> IndexMut<Pos> for Matrix<T> {
+    #[inline(always)]
+    fn index_mut(&mut self, pos: Pos) -> &mut T {
+        let (x, y) = (pos.0 as usize, pos.1 as usize);
+        &mut self.contents[x + y * self.width]
     }
 }

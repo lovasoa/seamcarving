@@ -1,8 +1,10 @@
+use std::ops::{Add, Mul, Sub};
+
 use image::{GenericImage, GenericImageView, ImageBuffer, Pixel};
 use pathfinding::prelude::dijkstra;
-use std::ops::{Add, Sub, Mul};
-use crate::rotated::Rotated;
+
 use crate::matrix::Matrix;
+use crate::rotated::Rotated;
 
 mod rotated;
 mod matrix;
@@ -22,6 +24,14 @@ impl Pos {
             .chain(std::iter::once(x))
             .chain(std::iter::once(x + 1))
             .map(move |x| Pos(x, y + 1))
+    }
+    /// Returns the top,bottom,left and right positions, in this order
+    fn surrounding(self) -> [Pos; 4] {
+        let Pos(x, y) = self;
+        [
+            Pos(x, y.saturating_sub(1)), Pos(x, y + 1),
+            Pos(x.saturating_sub(1), y), Pos(x + 1, y)
+        ]
     }
 }
 
@@ -79,13 +89,11 @@ impl From<(u32, u32)> for Pos {
 
 fn energy_fn<IMG: GenericImageView>(img: &IMG, pos: Pos) -> u32 {
     use num_traits::cast::ToPrimitive;
+    let [top, bottom, left, right] = pos.surrounding();
     let last_pos = max_pos(img);
-    std::iter::once(Pos(0, 1))
-        .chain(std::iter::once(Pos(1, 0)))
-        .map(|dir| -> u32 {
-            let mut next = pos + dir;
-            if !next.before(last_pos) { next = pos }
-            let prev = pos - dir;
+    [(top, bottom), (left, right)].iter()
+        .map(|&(prev, next)| -> u32 {
+            let next = if next.before(last_pos) { next } else { pos };
             let p1 = img.get_pixel(next.0, next.1);
             let p2 = img.get_pixel(prev.0, prev.1);
             p1.channels().iter().zip(p2.channels())
@@ -104,17 +112,36 @@ struct Carved<'a, IMG: GenericImageView>
     img: &'a IMG,
     removed: u32,
     pos_aliases: Matrix<u32>,
+    energy: Matrix<Option<u32>> // The energy is computed lazily, hence the Option
 }
 
 impl<'a, IMG: GenericImageView> Carved<'a, IMG>
     where <IMG as GenericImageView>::Pixel: 'static {
     fn new(img: &'a IMG) -> Self {
-        let pos_aliases = Matrix::from_fn(max_pos(img), |x, _y| x as u32);
-        Carved { img, removed: 0, pos_aliases }
+        let size = max_pos(img);
+        let pos_aliases = Matrix::from_fn(size, |x, _y| x as u32);
+        let energy = Matrix::from_fn(size, |_x, _y| None);
+        Carved { img, removed: 0, pos_aliases, energy }
     }
     fn remove_seam(&mut self, seam: &[Pos]) {
+        let last = max_pos(self.img);
+        seam.iter().for_each(|&pos| {
+            pos.surrounding().iter()
+                .filter(|&p| p.before(last))
+                .for_each(|&p| { self.energy[p] = None; })
+        });
         self.pos_aliases.remove_seam(seam);
+        self.energy.remove_seam(seam);
         self.removed += 1;
+    }
+    fn energy(&mut self, pos: Pos) -> u32 {
+        // TODO: implement the element API
+        let cached = self.energy[pos];
+        let computed = cached.unwrap_or_else(|| energy_fn(self.img, pos));
+        if cached == None {
+            self.energy[pos] = Some(computed);
+        }
+        computed
     }
     /// Given a position in the carved image, return a position in the original
     #[inline(always)]
@@ -178,7 +205,7 @@ fn carve_one<IMG: GenericImageView>(carved: &mut Carved<IMG>) {
                 Some(pos) =>
                     pos.successors()
                         .filter(|Pos(x, y)| *x < w && *y < h)
-                        .map(|pos| (Some(pos), energy_fn(carved, pos)))
+                        .map(|pos| (Some(pos), carved.energy(pos)))
                         .collect(),
             }
         },
@@ -217,7 +244,8 @@ pub fn resize<IMG: GenericImage>(
 #[cfg(test)]
 mod tests {
     use image::{GrayImage, ImageBuffer, Luma};
-    use crate::{resize, energy_fn, Pos};
+
+    use crate::{energy_fn, Pos, resize};
 
     #[test]
     fn energy_fn_correct() {
