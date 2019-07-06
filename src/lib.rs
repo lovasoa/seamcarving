@@ -2,11 +2,13 @@ use image::{GenericImage, GenericImageView, ImageBuffer, Pixel};
 use pathfinding::prelude::dijkstra;
 use std::ops::{Add, Sub, Mul};
 use crate::rotated::Rotated;
+use crate::matrix::Matrix;
 
 mod rotated;
+mod matrix;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
-struct Pos(u32, u32);
+pub(crate) struct Pos(u32, u32);
 
 impl Pos {
     #[inline(always)]
@@ -101,32 +103,24 @@ struct Carved<'a, IMG: GenericImageView>
     where <IMG as GenericImageView>::Pixel: 'static {
     img: &'a IMG,
     removed: u32,
-    pos_aliases: Vec<u32>,
+    pos_aliases: Matrix<u32>,
 }
 
 impl<'a, IMG: GenericImageView> Carved<'a, IMG>
     where <IMG as GenericImageView>::Pixel: 'static {
     fn new(img: &'a IMG) -> Self {
-        let (w, h) = img.dimensions();
-        let pos_aliases = (0..w * h).map(|i| i % w).collect();
+        let pos_aliases = Matrix::from_fn(max_pos(img), |x, _y| x as u32);
         Carved { img, removed: 0, pos_aliases }
     }
     fn remove_seam(&mut self, seam: &[Pos]) {
-        let (w, _h) = self.img.dimensions();
-        self.pos_aliases.chunks_exact_mut(w as usize)
-            .zip(seam)
-            .for_each(|(aliases, &Pos(x, _y))| {
-                let end = &mut aliases[x as usize..];
-                if !end.is_empty() { end.rotate_left(1) }
-            });
+        self.pos_aliases.remove_seam(seam);
         self.removed += 1;
     }
     /// Given a position in the carved image, return a position in the original
     #[inline(always)]
     fn transform_pos(&self, pos: Pos) -> Pos {
         let mut pos = pos;
-        let w = self.img.width();
-        pos.0 = self.pos_aliases[(pos.0 + pos.1 * w) as usize];
+        pos.0 = self.pos_aliases[pos];
         pos
     }
 }
