@@ -30,8 +30,11 @@ impl Pos {
     }
     fn successors(self) -> impl Iterator<Item=Pos> {
         let Pos(x, y) = self;
-        vec![x.checked_sub(1), Some(x), x.checked_add(1)].into_iter()
-            .filter_map(move |x| x.map(|x| Pos(x, y + 1)))
+        std::iter::once(x.checked_sub(1))
+            .flatten()
+            .chain(std::iter::once(x))
+            .chain(std::iter::once(x + 1))
+            .map(move |x| Pos(x, y + 1))
     }
 }
 
