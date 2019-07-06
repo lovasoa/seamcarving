@@ -111,8 +111,9 @@ struct Carved<'a, IMG: GenericImageView>
     where <IMG as GenericImageView>::Pixel: 'static {
     img: &'a IMG,
     removed: u32,
+    // pos_aliases is a matrix such as img[x,y] = self[pos_aliases[x,y],y]
     pos_aliases: Matrix<u32>,
-    energy: Matrix<Option<u32>> // The energy is computed lazily, hence the Option
+    energy_cache: Matrix<Option<u32>>, // The energy is computed lazily, hence the Option
 }
 
 impl<'a, IMG: GenericImageView> Carved<'a, IMG>
@@ -121,27 +122,25 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
         let size = max_pos(img);
         let pos_aliases = Matrix::from_fn(size, |x, _y| x as u32);
         let energy = Matrix::from_fn(size, |_x, _y| None);
-        Carved { img, removed: 0, pos_aliases, energy }
+        Carved { img, removed: 0, pos_aliases, energy_cache: energy }
     }
     fn remove_seam(&mut self, seam: &[Pos]) {
         let last = max_pos(self.img);
-        seam.iter().for_each(|&pos| {
+        seam.iter().for_each(|&pos| { // invalidate the energy cache around the seam
             pos.surrounding().iter()
                 .filter(|&p| p.before(last))
-                .for_each(|&p| { self.energy[p] = None; })
+                .for_each(|&p| { self.energy_cache[p] = None; })
         });
         self.pos_aliases.remove_seam(seam);
-        self.energy.remove_seam(seam);
+        self.energy_cache.remove_seam(seam);
         self.removed += 1;
     }
     fn energy(&mut self, pos: Pos) -> u32 {
-        // TODO: implement the element API
-        let cached = self.energy[pos];
-        let computed = cached.unwrap_or_else(|| energy_fn(self, pos));
-        if cached == None {
-            self.energy[pos] = Some(computed);
-        }
-        computed
+        self.energy_cache[pos].unwrap_or_else(|| {
+            let computed = energy_fn(self, pos);
+            self.energy_cache[pos] = Some(computed);
+            computed
+        })
     }
     /// Given a position in the carved image, return a position in the original
     #[inline(always)]
