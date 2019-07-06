@@ -276,4 +276,20 @@ mod tests {
             9, 3, 5
         ]);
     }
+
+    #[test]
+    fn updates_energy() {
+        let img = GrayImage::from_raw(8, 3, vec![
+            7, 9, 9, 0, 0, 0, 9, 5,
+            8, 9, 9, 0, 0, 0, 9, 3,
+            8, 9, 0, 0, 0, 9, 7, 9,
+        ]).unwrap();
+        let resized = resize(&img, 6, 3);
+        assert_eq!(resized.dimensions(), (6, 3));
+        assert_eq!(resized.into_raw(), vec![
+            7, 9, 0, 0, 9, 5,
+            8, 9, 0, 0, 9, 3,
+            9, 0, 0, 9, 7, 9
+        ]);
+    }
 }
