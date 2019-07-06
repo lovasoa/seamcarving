@@ -137,7 +137,7 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
     fn energy(&mut self, pos: Pos) -> u32 {
         // TODO: implement the element API
         let cached = self.energy[pos];
-        let computed = cached.unwrap_or_else(|| energy_fn(self.img, pos));
+        let computed = cached.unwrap_or_else(|| energy_fn(self, pos));
         if cached == None {
             self.energy[pos] = Some(computed);
         }
