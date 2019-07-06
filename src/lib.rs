@@ -22,7 +22,7 @@ struct Pos(u32, u32);
 
 impl Pos {
     #[inline(always)]
-    fn before(&self, max: &Pos) -> bool {
+    fn before(&self, max: Pos) -> bool {
         self.0 < max.0 && self.1 < max.1
     }
     fn successors<'a>(&'a self, dir: Direction) -> impl Iterator<Item=Pos> + 'a {
@@ -109,14 +109,14 @@ impl From<(u32, u32)> for Pos {
     }
 }
 
-fn energy_fn<IMG: GenericImageView>(img: &IMG, pos: &Pos) -> u32 {
+fn energy_fn<IMG: GenericImageView>(img: &IMG, pos: Pos) -> u32 {
     use num_traits::cast::ToPrimitive;
-    let last_pos = &max_pos(img);
+    let last_pos = max_pos(img);
     Direction::all().iter()
         .map(|&dir| -> u32{
-            let mut next = *pos + dir.into();
-            if !next.before(last_pos) { next = *pos }
-            let prev = *pos - dir.into();
+            let mut next = pos + dir.into();
+            if !next.before(last_pos) { next = pos }
+            let prev = pos - dir.into();
             let p1 = img.get_pixel(next.0, next.1);
             let p2 = img.get_pixel(prev.0, prev.1);
             p1.channels().iter().zip(p2.channels())
@@ -149,7 +149,7 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
             .collect();
         Carved { img, dir, removed: 0, pos_aliases }
     }
-    fn remove_seam(&mut self, seam: &Vec<Pos>) {
+    fn remove_seam(&mut self, seam: &[Pos]) {
         let orth = self.dir.other();
         let max_orth = max_pos(self.img).component(orth);
         self.pos_aliases.chunks_exact_mut(max_orth as usize)
@@ -157,7 +157,7 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
             .for_each(|(aliases, pos)| {
                 let n = pos.component(orth);
                 let end = &mut aliases[n as usize..];
-                if end.len() > 0 { end.rotate_left(1) }
+                if !end.is_empty() { end.rotate_left(1) }
             });
         self.removed += 1;
     }
@@ -212,7 +212,7 @@ fn carve_one<IMG: GenericImageView>(
     carved: &mut Carved<IMG>,
     dir: Direction,
 ) {
-    let last_pos = &max_pos(carved);
+    let last_pos = max_pos(carved);
     let end_coord = last_pos.component(dir) - 1;
     let (seam, _cost): (Vec<Option<Pos>>, u32) = dijkstra(
         &None,
@@ -221,12 +221,12 @@ fn carve_one<IMG: GenericImageView>(
                 None =>
                     (0..Pos::from(carved.dimensions()).component(dir.other()))
                         .map(|x| Pos::from(dir.other()) * x)
-                        .map(|pos| (Some(pos), energy_fn(carved, &pos)))
+                        .map(|pos| (Some(pos), energy_fn(carved, pos)))
                         .collect(),
                 Some(pos) =>
                     pos.successors(dir)
                         .filter(|pos| pos.before(last_pos))
-                        .map(|pos| (Some(pos), energy_fn(carved, &pos)))
+                        .map(|pos| (Some(pos), energy_fn(carved, pos)))
                         .collect(),
             }
         },
@@ -258,8 +258,8 @@ pub fn resize<IMG: GenericImage>(
 ) -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>>
     where <IMG as GenericImageView>::Pixel: 'static {
     let Pos(to_remove_x, to_remove_y) = max_pos(img) - Pos(width, height);
-    let mut carved_x = carve(img, Direction::Y, to_remove_x);
-    let carved_y = carve(&mut carved_x, Direction::X, to_remove_y);
+    let carved_x = carve(img, Direction::Y, to_remove_x);
+    let carved_y = carve(&carved_x, Direction::X, to_remove_y);
     carved_y.finalize()
 }
 
@@ -275,7 +275,7 @@ mod tests {
             1, 5, 9,
         ]).unwrap();
         let energy = ImageBuffer::from_fn(3, 2, |x, y| {
-            Luma([energy_fn(&img, &Pos(x, y))])
+            Luma([energy_fn(&img, Pos(x, y))])
         });
         let expected = vec![
             (2 * 2 + 2 * 2), (1 * 1 + 4 * 4), (5 * 5 + 3 * 3),
