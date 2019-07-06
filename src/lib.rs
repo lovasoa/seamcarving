@@ -5,10 +5,10 @@
 use image::{GenericImageView, ImageBuffer, Pixel};
 use pathfinding::prelude::dijkstra;
 
-use crate::matrix::Matrix;
-use crate::rotated::Rotated;
-use crate::pos::Pos;
 use crate::energy::energy_fn;
+use crate::matrix::Matrix;
+use crate::pos::Pos;
+use crate::rotated::Rotated;
 
 mod rotated;
 mod matrix;
@@ -121,28 +121,30 @@ impl<'a, IMG: GenericImageView> GenericImageView for Carved<'a, IMG> {
 /// Carve one vertical seam in the image
 fn carve_one<IMG: GenericImageView>(carved: &mut Carved<IMG>) {
     let (w, h) = carved.dimensions();
-    let end_coord = h - 1;
-    let (seam, _cost): (Vec<Option<Pos>>, u32) = dijkstra(
-        &None,
-        |maybe_pos: &Option<Pos>| -> Vec<_>{
-            match maybe_pos {
-                None =>
-                    (0..w).map(|x| (
-                        Some(Pos(x, 0)),
-                        energy_fn(carved, Pos(x, 0))
-                    )).collect(),
-                Some(pos) =>
-                    pos.successors()
-                        .filter(|Pos(x, y)| *x < w && *y < h)
-                        .map(|pos| (Some(pos), carved.energy(pos)))
-                        .collect(),
-            }
-        },
-        |maybe_pos: &Option<Pos>| {
-            maybe_pos.map_or(false, |Pos(_x, y)| y == end_coord)
-        },
-    ).expect("No seam found. This is a bug in seamcarving");
-    let seam: Vec<Pos> = seam.into_iter().skip(1).collect::<Option<_>>().unwrap();
+    // Avoid checking for the empty image case in the hot path
+    let seam: Vec<Pos> = if h == 0 { vec![] } else {
+        let (seam, _cost): (Vec<Option<Pos>>, u32) = dijkstra(
+            &None,
+            |maybe_pos: &Option<Pos>| -> Vec<_>{
+                match maybe_pos {
+                    None =>
+                        (0..w).map(|x| (
+                            Some(Pos(x, 0)),
+                            energy_fn(carved, Pos(x, 0))
+                        )).collect(),
+                    Some(pos) =>
+                        pos.successors()
+                            .filter(|&Pos(x, y)| x < w && y < h)
+                            .map(|pos| (Some(pos), carved.energy(pos)))
+                            .collect(),
+                }
+            },
+            |maybe_pos: &Option<Pos>| {
+                maybe_pos.map_or(false, |Pos(_x, y)| y + 1 == h)
+            },
+        ).expect("No seam found. This is a bug in seamcarving");
+        seam.into_iter().skip(1).collect::<Option<_>>().expect("empty seam. This is a bug")
+    };
     carved.remove_seam(&seam);
 }
 

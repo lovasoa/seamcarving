@@ -53,3 +53,12 @@ fn updates_energy() {
         9, 0, 0, 9, 7, 9
     ]);
 }
+
+
+#[test]
+fn single_pixel() {
+    let img = GrayImage::from_raw(1, 1, vec![42]).unwrap();
+    let resized = resize(&img, 0, 0);
+    assert_eq!(resized.dimensions(), (0, 0));
+    assert_eq!(resized.into_raw(), vec![]);
+}
