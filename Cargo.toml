@@ -14,10 +14,8 @@ edition = "2018"
 image = "0.21"
 pathfinding = "1.1"
 num-traits = "0.2"
-quickcheck = "0.8"
 
 [dev-dependencies]
-quickcheck = "0.8"
 criterion = "0.2"
 
 [badges]
