@@ -6,21 +6,6 @@ use crate::rotated::Rotated;
 mod rotated;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
-pub enum Direction { X, Y }
-
-impl Direction {
-    #[inline(always)]
-    pub fn other(self) -> Direction {
-        match self {
-            Direction::X => Direction::Y,
-            Direction::Y => Direction::X,
-        }
-    }
-    #[inline(always)]
-    pub fn all() -> [Direction; 2] { [Direction::X, Direction::Y] }
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 struct Pos(u32, u32);
 
 impl Pos {
@@ -83,16 +68,6 @@ impl Mul<Pos> for Pos {
     }
 }
 
-impl From<Direction> for Pos {
-    #[inline(always)]
-    fn from(d: Direction) -> Self {
-        match d {
-            Direction::X => Pos(1, 0),
-            Direction::Y => Pos(0, 1)
-        }
-    }
-}
-
 impl From<(u32, u32)> for Pos {
     #[inline(always)]
     fn from((x, y): (u32, u32)) -> Self {
@@ -103,11 +78,12 @@ impl From<(u32, u32)> for Pos {
 fn energy_fn<IMG: GenericImageView>(img: &IMG, pos: Pos) -> u32 {
     use num_traits::cast::ToPrimitive;
     let last_pos = max_pos(img);
-    Direction::all().iter()
-        .map(|&dir| -> u32{
-            let mut next = pos + dir.into();
+    std::iter::once(Pos(0, 1))
+        .chain(std::iter::once(Pos(1, 0)))
+        .map(|dir| -> u32 {
+            let mut next = pos + dir;
             if !next.before(last_pos) { next = pos }
-            let prev = pos - dir.into();
+            let prev = pos - dir;
             let p1 = img.get_pixel(next.0, next.1);
             let p2 = img.get_pixel(prev.0, prev.1);
             p1.channels().iter().zip(p2.channels())
