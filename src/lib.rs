@@ -1,6 +1,9 @@
 use image::{GenericImage, GenericImageView, ImageBuffer, Pixel};
 use pathfinding::prelude::dijkstra;
 use std::ops::{Add, Sub, Mul};
+use crate::rotated::Rotated;
+
+mod rotated;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub enum Direction { X, Y }
@@ -173,12 +176,16 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
         let j_alias = self.pos_aliases[(i * max_orth + j) as usize];
         u * i + v * j_alias
     }
-    fn finalize(self) -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>> {
-        let (w, h) = self.dimensions();
-        ImageBuffer::from_fn(w, h, |x, y| {
-            self.get_pixel(x, y)
-        })
-    }
+}
+
+fn image_view_to_buffer<IMG: GenericImageView>(img: &IMG)
+                                               -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>>
+    where <IMG as GenericImageView>::Pixel: 'static
+{
+    let (w, h) = img.dimensions();
+    ImageBuffer::from_fn(w, h, |x, y| {
+        img.get_pixel(x, y)
+    })
 }
 
 impl<'a, IMG: GenericImageView> GenericImageView for Carved<'a, IMG> {
@@ -259,8 +266,10 @@ pub fn resize<IMG: GenericImage>(
     where <IMG as GenericImageView>::Pixel: 'static {
     let Pos(to_remove_x, to_remove_y) = max_pos(img) - Pos(width, height);
     let carved_x = carve(img, Direction::Y, to_remove_x);
-    let carved_y = carve(&carved_x, Direction::X, to_remove_y);
-    carved_y.finalize()
+    let rotated = Rotated(&carved_x);
+    let carved_y = carve(&rotated, Direction::Y, to_remove_y);
+    let rerotated = Rotated(&carved_y);
+    image_view_to_buffer(&rerotated)
 }
 
 #[cfg(test)]
