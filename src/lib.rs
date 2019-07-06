@@ -1,90 +1,16 @@
-use std::ops::{Add, Mul, Sub};
-
 use image::{GenericImage, GenericImageView, ImageBuffer, Pixel};
 use pathfinding::prelude::dijkstra;
 
 use crate::matrix::Matrix;
 use crate::rotated::Rotated;
+use crate::pos::Pos;
 
 mod rotated;
 mod matrix;
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
-pub(crate) struct Pos(u32, u32);
-
-impl Pos {
-    #[inline(always)]
-    fn before(self, max: Pos) -> bool {
-        self.0 < max.0 && self.1 < max.1
-    }
-    fn successors(self) -> impl Iterator<Item=Pos> {
-        let Pos(x, y) = self;
-        std::iter::once(x.checked_sub(1))
-            .flatten()
-            .chain(std::iter::once(x))
-            .chain(std::iter::once(x + 1))
-            .map(move |x| Pos(x, y + 1))
-    }
-    /// Returns the top,bottom,left and right positions, in this order
-    fn surrounding(self) -> [Pos; 4] {
-        let Pos(x, y) = self;
-        [
-            Pos(x, y.saturating_sub(1)), Pos(x, y + 1),
-            Pos(x.saturating_sub(1), y), Pos(x + 1, y)
-        ]
-    }
-}
+mod pos;
 
 fn max_pos<IMG: GenericImageView>(img: &IMG) -> Pos {
     Pos(img.width(), img.height())
-}
-
-impl From<Pos> for (u32, u32) {
-    #[inline(always)]
-    fn from(Pos(x, y): Pos) -> Self { (x, y) }
-}
-
-impl Add<Pos> for Pos {
-    type Output = Pos;
-
-    #[inline(always)]
-    fn add(self, rhs: Pos) -> Self::Output {
-        Pos(self.0 + rhs.0, self.1 + rhs.1)
-    }
-}
-
-impl Sub<Pos> for Pos {
-    type Output = Pos;
-
-    #[inline(always)]
-    fn sub(self, rhs: Pos) -> Self::Output {
-        Pos(self.0.saturating_sub(rhs.0), self.1.saturating_sub(rhs.1))
-    }
-}
-
-impl Mul<u32> for Pos {
-    type Output = Pos;
-
-    #[inline(always)]
-    fn mul(self, rhs: u32) -> Self::Output {
-        Pos(self.0 * rhs, self.1 * rhs)
-    }
-}
-
-impl Mul<Pos> for Pos {
-    type Output = Pos;
-
-    #[inline(always)]
-    fn mul(self, rhs: Pos) -> Self::Output {
-        Pos(self.0 * rhs.0, self.1 * rhs.1)
-    }
-}
-
-impl From<(u32, u32)> for Pos {
-    #[inline(always)]
-    fn from((x, y): (u32, u32)) -> Self {
-        Pos(x, y)
-    }
 }
 
 fn energy_fn<IMG: GenericImageView>(img: &IMG, pos: Pos) -> u32 {
