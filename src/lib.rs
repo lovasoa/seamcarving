@@ -130,7 +130,7 @@ fn carve_one<IMG: GenericImageView>(carved: &mut Carved<IMG>) {
                     None =>
                         (0..w).map(|x| (
                             Some(Pos(x, 0)),
-                            energy_fn(carved, Pos(x, 0))
+                            carved.energy(Pos(x, 0))
                         )).collect(),
                     Some(pos) =>
                         pos.successors()
