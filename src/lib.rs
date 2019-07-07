@@ -55,7 +55,7 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
         Carved { img, removed: 0, pos_aliases, energy_cache: energy }
     }
     fn remove_seam(&mut self, seam: &[Pos]) {
-        let last = max_pos(self.img);
+        let last = max_pos(self);
         seam.iter().for_each(|&pos| { // invalidate the energy cache around the seam
             pos.surrounding().iter()
                 .filter(|&p| p.before(last))
