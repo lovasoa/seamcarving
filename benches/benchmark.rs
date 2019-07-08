@@ -40,22 +40,23 @@ fn criterion_benchmark(c: &mut Criterion) {
         )
     });
 
+    let (w, h) = (160, 90);
     c.bench(
         "Fibonacci",
         ParameterizedBenchmark::new(
             "this crate",
-            |b, &i| {
-                let gray_img = black_box(gray_bench_image(100, 100));
+            move |b, &i| {
+                let gray_img = black_box(gray_bench_image(w, h));
                 b.iter(||
-                    seamcarving::resize(&gray_img, 100 - i, 100))
+                    seamcarving::resize(&gray_img, w - i, h))
             },
             vec![2, 5, 10, 20],
         ).with_function(
             "imageproc",
-            |b, &i| {
-                let gray_img = black_box(gray_bench_image(100, 100));
+            move |b, &i| {
+                let gray_img = black_box(gray_bench_image(w, h));
                 b.iter(||
-                    imageproc::seam_carving::shrink_width(&gray_img, 100 - i))
+                    imageproc::seam_carving::shrink_width(&gray_img, w - i))
             },
         ),
     );
