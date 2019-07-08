@@ -122,31 +122,28 @@ impl<'a, IMG: GenericImageView> GenericImageView for Carved<'a, IMG> {
 /// Carve one vertical seam in the image
 fn carve_one<IMG: GenericImageView>(carved: &mut Carved<IMG>) {
     let (w, h) = carved.dimensions();
+    let start_pos = Pos(w + 1, 0);
     // Avoid checking for the empty image case in the hot path
     let seam: Vec<Pos> = if h == 0 { vec![] } else {
-        let (seam, _cost): (Vec<Option<Pos>>, u32) = dijkstra(
-            &None,
-            |maybe_pos: &Option<Pos>| -> SmallVec<[(Option<Pos>, u32); 3]>{
-                match maybe_pos {
-                    None => {
-                        let mut v = SmallVec::with_capacity(w as usize);
-                        v.extend((0..w).map(|x| (
-                            Some(Pos(x, 0)),
-                            carved.energy(Pos(x, 0))
-                        )));
-                        v
-                    }
-                    Some(pos) =>
-                        pos.successors(w, h)
-                            .map(|pos| (Some(pos), carved.energy(pos)))
-                            .collect(),
+        let (seam, _cost): (Vec<Pos>, u32) = dijkstra(
+            &start_pos,
+            |&pos| -> SmallVec<[(Pos, u32); 3]>{
+                if pos == start_pos {
+                    let mut v = SmallVec::with_capacity(w as usize);
+                    v.extend((0..w).map(|x| (
+                        Pos(x, 0),
+                        carved.energy(Pos(x, 0))
+                    )));
+                    v
+                } else {
+                    pos.successors(w, h)
+                        .map(|pos| (pos, carved.energy(pos)))
+                        .collect()
                 }
             },
-            |maybe_pos: &Option<Pos>| {
-                maybe_pos.map_or(false, |Pos(_x, y)| y + 1 == h)
-            },
+            |&Pos(_x,y)| y + 1 == h,
         ).expect("No seam found. This is a bug in seamcarving");
-        seam.into_iter().skip(1).collect::<Option<_>>().expect("empty seam. This is a bug")
+        seam.into_iter().skip(1).collect()
     };
     carved.remove_seam(&seam);
 }
