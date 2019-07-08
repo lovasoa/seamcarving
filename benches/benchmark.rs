@@ -50,7 +50,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                 b.iter(||
                     seamcarving::resize(&gray_img, w - i, h))
             },
-            vec![1, 10, 20, 40, 80],
+            vec![w / 16, w / 8, w / 4, w / 2, 2 * w / 3],
         ).with_function(
             "imageproc",
             move |b, &i| {
