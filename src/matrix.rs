@@ -8,7 +8,7 @@ pub(crate) struct Matrix<T> {
 }
 
 impl<T> Matrix<T> {
-    pub fn from_fn(size: Pos, f: fn(x: usize, y: usize) -> T) -> Self {
+    pub fn from_fn(size: Pos, mut f: impl FnMut(usize, usize) -> T) -> Self {
         let (width, height) = (size.0 as usize, size.1 as usize);
         let size = width * height;
         let mut contents = Vec::with_capacity(size);

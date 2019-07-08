@@ -22,6 +22,27 @@ impl Pos {
                 )
                 .map(move |x| Pos(x, y)))
     }
+
+    pub fn predecessors(self, size: Pos)
+                        -> impl Iterator<Item=Pos> {
+        let Pos(x, y) = self;
+        once(y)
+            .flat_map(|y| y.checked_sub(1))
+            .flat_map(move |y|
+                once(x.checked_sub(1))
+                    .flatten()
+                    .chain(once(x))
+                    .chain(once(x + 1)
+                        .filter(move |&x| x < size.0)
+                    )
+                    .map(move |x| Pos(x, y)))
+    }
+
+    pub fn iter_in_rect(end: Pos) -> impl Iterator<Item=Pos> {
+        (0..end.0 * end.1)
+            .map(move |i| Pos(i % end.0, i / end.0))
+    }
+
     /// Returns the top,bottom,left and right positions, in this order
     pub fn surrounding(self) -> [Pos; 4] {
         let Pos(x, y) = self;

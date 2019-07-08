@@ -15,6 +15,7 @@ mod rotated;
 mod matrix;
 mod pos;
 mod energy;
+mod seamfinder;
 
 
 /// Resize an image to a lower width and height,
