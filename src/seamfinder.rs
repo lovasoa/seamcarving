@@ -2,6 +2,7 @@ use std::iter::successors;
 
 use crate::matrix::Matrix;
 use crate::pos::Pos;
+use std::cmp::Ordering;
 
 #[derive(Debug)]
 pub(crate) struct SeamFinder {
@@ -17,7 +18,7 @@ pub(crate) struct SeamFinder {
     dirty_bounds: DirtyBounds,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq)]
 struct SeamElem {
     predecessor_dx: i8,
     energy: u32,
@@ -64,6 +65,24 @@ impl SeamElem {
         }
         p.1 -= 1;
         p
+    }
+}
+
+impl PartialEq for SeamElem {
+    fn eq(&self, other: &Self) -> bool {
+        self.energy == other.energy
+    }
+}
+
+impl PartialOrd for SeamElem {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.energy.partial_cmp(&other.energy)
+    }
+}
+
+impl Ord for SeamElem {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.energy.cmp(&other.energy)
     }
 }
 
@@ -129,7 +148,7 @@ impl SeamFinder {
                         None
                     }
                 })
-                .min_by_key(|e| e.energy)
+                .min()
                 .unwrap_or_else(|| SeamElem::new(pos, pos, delta_e));
             self.contents[pos] = Some(elem);
         }
