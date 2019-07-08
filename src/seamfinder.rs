@@ -22,9 +22,9 @@ impl SeamFinder {
         self.fill(energy);
         let mut seam = Vec::with_capacity(self.size.1 as usize);
         // Find the bottom pixel with the lowest energy
-        let bottom_y = self.size.1 - 1;
+        let bottom_y: Option<u32> = self.size.1.checked_sub(1);
         let init = (0..self.size.0)
-            .map(|x| Pos(x, bottom_y))
+            .flat_map(|x| bottom_y.map(|y| Pos(x, y)))
             .min_by_key(|&p| {
                 self.contents[p].take().expect("should have been filled").energy
             });
