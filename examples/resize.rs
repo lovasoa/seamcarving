@@ -2,7 +2,7 @@ use std::env;
 use std::path::PathBuf;
 use std::error::Error;
 
-fn main() -> Result<(), Box<Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
     if args.len() < 4 {
         return Err("Usage: resize /path/to/image.jpg desired_width desired_height".into());
