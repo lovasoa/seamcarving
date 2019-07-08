@@ -6,14 +6,33 @@ use crate::pos::Pos;
 #[derive(Debug)]
 pub(crate) struct SeamFinder {
     size: Pos,
+
+    // The dependencies and energies
     contents: Matrix<Option<SeamElem>>,
+
+    // Vector used during invalid position clearing
     to_clear: Vec<Pos>,
+
+    // min and max x values that will have to be recomputed
+    dirty_bounds: DirtyBounds,
 }
 
 #[derive(Debug)]
 struct SeamElem {
     predecessor_dx: i8,
     energy: u32,
+}
+
+#[derive(Debug)]
+struct DirtyBounds(u32, u32);
+
+impl DirtyBounds {
+    fn clean(size: Pos) -> Self { DirtyBounds(size.0, 0) }
+    fn dirty(size: Pos) -> Self { DirtyBounds(0, size.0) }
+    fn update(&mut self, Pos(x, _): Pos) {
+        if x < self.0 { self.0 = x }
+        if x >= self.1 { self.1 = x + 1 }
+    }
 }
 
 impl SeamElem {
@@ -41,7 +60,8 @@ impl SeamFinder {
     pub fn new(size: Pos) -> Self {
         let contents: Matrix<Option<SeamElem>> = Matrix::from_fn(size, |_, _| None);
         let to_clear = Vec::with_capacity(size.1 as usize);
-        SeamFinder { size, contents, to_clear }
+        let dirty_bounds = DirtyBounds::dirty(size);
+        SeamFinder { size, contents, to_clear, dirty_bounds }
     }
 
     pub fn extract_seam<F: FnMut(Pos) -> u32>(&mut self, energy: F) -> Vec<Pos> {
@@ -70,7 +90,9 @@ impl SeamFinder {
     }
 
     fn fill<F: FnMut(Pos) -> u32>(&mut self, mut energy: F) {
-        for pos in Pos::iter_in_rect(self.size) {
+        let start = Pos(self.dirty_bounds.0, 0);
+        let end = Pos(self.dirty_bounds.1, self.size.1);
+        for pos in Pos::iter_in_rect(start, end) {
             if self.contents[pos].is_some() { continue; }
             let delta_e = energy(pos);
             let elem = pos.predecessors(self.size)
@@ -83,6 +105,7 @@ impl SeamFinder {
                 .unwrap_or(SeamElem::new(pos, pos, delta_e));
             self.contents[pos] = Some(elem);
         }
+        self.dirty_bounds = DirtyBounds::clean(self.size);
     }
 
     /// Recursively invalidates all cached information about a position
@@ -91,6 +114,7 @@ impl SeamFinder {
         self.to_clear.push(p);
         while let Some(pos) = self.to_clear.pop() {
             self.contents[pos] = None;
+            self.dirty_bounds.update(pos);
             for s in pos.successors(w, h) {
                 if let Some(e) = &self.contents[s] {
                     if e.predecessor(s) == pos {
@@ -133,7 +157,7 @@ mod tests {
     fn fills() {
         let mut finder = SeamFinder::new(Pos(10, 10));
         finder.fill(|_| 42);
-        Pos::iter_in_rect(finder.size)
+        Pos::iter_in_rect(Pos(0, 0), finder.size)
             .for_each(|p|
                 assert!(finder.contents[p].is_some())
             )

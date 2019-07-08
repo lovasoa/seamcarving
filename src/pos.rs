@@ -1,5 +1,5 @@
 use std::ops::{Sub, Add};
-use std::iter::once;
+use std::iter::{once, successors};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub(crate) struct Pos(pub u32, pub u32);
@@ -36,9 +36,19 @@ impl Pos {
                     .map(move |x| Pos(x, y)))
     }
 
-    pub fn iter_in_rect(end: Pos) -> impl Iterator<Item=Pos> {
-        (0..(end.0 * end.1))
-            .map(move |i| Pos(i % end.0, i / end.0))
+    pub fn iter_in_rect(start: Pos, end: Pos) -> impl Iterator<Item=Pos> {
+        successors(
+            if start.before(end) { Some(start) } else { None },
+            move |&pos| {
+                let Pos(mut x, mut y) = pos;
+                x += 1;
+                if x == end.0 {
+                    x = start.0;
+                    y += 1;
+                    if y == end.1 { return None; }
+                }
+                Some(Pos(x, y))
+            })
     }
 
     /// Returns the top,bottom,left and right positions, in this order
