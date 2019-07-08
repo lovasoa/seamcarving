@@ -1,5 +1,3 @@
-#![type_length_limit="1814752"]
-
 /// Content-preserving image resizing
 ///
 /// See: [resize]

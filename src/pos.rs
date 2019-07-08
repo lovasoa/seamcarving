@@ -14,23 +14,21 @@ impl Pos {
         let Pos(x, y) = self;
         once(y + 1)
             .filter(move |&y| y < height)
-            .flat_map(move |y| once(x.checked_sub(1))
-                .flatten()
-                .chain(once(x))
-                .chain(once(x + 1)
-                    .filter(move |&x| x < width)
-                )
-                .map(move |x| Pos(x, y)))
+            .flat_map(move |y|
+                x.checked_sub(1).into_iter()
+                    .chain(once(x))
+                    .chain(once(x + 1)
+                        .filter(move |&x| x < width)
+                    )
+                    .map(move |x| Pos(x, y)))
     }
 
     pub fn predecessors(self, size: Pos)
                         -> impl Iterator<Item=Pos> {
         let Pos(x, y) = self;
-        once(y)
-            .flat_map(|y| y.checked_sub(1))
+        y.checked_sub(1).into_iter()
             .flat_map(move |y|
-                once(x.checked_sub(1))
-                    .flatten()
+                x.checked_sub(1).into_iter()
                     .chain(once(x))
                     .chain(once(x + 1)
                         .filter(move |&x| x < size.0)
