@@ -1,4 +1,5 @@
 use std::ops::{Sub, Add};
+use std::iter::once;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub(crate) struct Pos(pub u32, pub u32);
@@ -8,13 +9,18 @@ impl Pos {
     pub fn before(self, max: Pos) -> bool {
         self.0 < max.0 && self.1 < max.1
     }
-    pub fn successors(self) -> impl Iterator<Item=Pos> {
+    pub fn successors(self, width: u32, height: u32)
+                      -> impl Iterator<Item=Pos> {
         let Pos(x, y) = self;
-        std::iter::once(x.checked_sub(1))
-            .flatten()
-            .chain(std::iter::once(x))
-            .chain(std::iter::once(x + 1))
-            .map(move |x| Pos(x, y + 1))
+        once(y + 1)
+            .filter(move |&y| y < height)
+            .flat_map(move |y| once(x.checked_sub(1))
+                .flatten()
+                .chain(once(x))
+                .chain(once(x + 1)
+                    .filter(move |&x| x < width)
+                )
+                .map(move |x| Pos(x, y)))
     }
     /// Returns the top,bottom,left and right positions, in this order
     pub fn surrounding(self) -> [Pos; 4] {

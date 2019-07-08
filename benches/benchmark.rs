@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use criterion::{Criterion, criterion_group, criterion_main};
+use criterion::{Criterion, criterion_group, criterion_main, ParameterizedBenchmark};
 use criterion::black_box;
 use image::{DynamicImage, GenericImageView, GrayImage, Luma};
 
@@ -39,13 +39,26 @@ fn criterion_benchmark(c: &mut Criterion) {
             seamcarving::resize(&img, 95, 95)
         )
     });
-    c.bench_function("shrink_width_s100_r8", |b| {
-        let img = black_box(gray_bench_image(100, 100));
 
-        b.iter(||
-            seamcarving::resize(&img, 92, 100)
-        )
-    });
+    c.bench(
+        "Fibonacci",
+        ParameterizedBenchmark::new(
+            "this crate",
+            |b, &i| {
+                let gray_img = black_box(gray_bench_image(100, 100));
+                b.iter(||
+                    seamcarving::resize(&gray_img, 100 - i, 100))
+            },
+            vec![2, 5, 10, 20],
+        ).with_function(
+            "imageproc",
+            |b, &i| {
+                let gray_img = black_box(gray_bench_image(100, 100));
+                b.iter(||
+                    imageproc::seam_carving::shrink_width(&gray_img, 100 - i))
+            },
+        ),
+    );
 }
 
 criterion_group! {

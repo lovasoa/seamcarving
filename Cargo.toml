@@ -17,6 +17,7 @@ num-traits = "0.2"
 
 [dev-dependencies]
 criterion = "0.2"
+imageproc = "0.18.0"
 
 [badges]
 travis-ci = { repository = "lovasoa/seamcarving" }
