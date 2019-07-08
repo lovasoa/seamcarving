@@ -42,9 +42,9 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     let (w, h) = (160, 90);
     c.bench(
-        "Fibonacci",
+        &format!("{w}x{h} to ({w}-i)x{h}", w = w, h = h),
         ParameterizedBenchmark::new(
-            "this crate",
+            "seamcarving",
             move |b, &i| {
                 let gray_img = black_box(gray_bench_image(w, h));
                 b.iter(||
