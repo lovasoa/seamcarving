@@ -1,17 +1,15 @@
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use criterion::{Criterion, criterion_group, criterion_main, ParameterizedBenchmark};
 use criterion::black_box;
+use criterion::{criterion_group, criterion_main, Criterion, ParameterizedBenchmark};
 use image::{DynamicImage, GenericImageView, GrayImage, Luma};
 
 fn open_image() -> DynamicImage {
-    let path: PathBuf = [
-        Path::new(file!()).parent().unwrap(),
-        Path::new("input.png")
-    ].iter().collect();
-    let img = image::open(path)
-        .expect("input image not found");
+    let path: PathBuf = [Path::new(file!()).parent().unwrap(), Path::new("input.png")]
+        .iter()
+        .collect();
+    let img = image::open(path).expect("input image not found");
     assert_eq!(img.dimensions(), (100, 100));
     img
 }
@@ -30,14 +28,11 @@ pub fn gray_bench_image(width: u32, height: u32) -> GrayImage {
     image
 }
 
-
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("100x100 to 95x95", |b| {
         let img = black_box(open_image());
 
-        b.iter(||
-            seamcarving::resize(&img, 95, 95)
-        )
+        b.iter(|| seamcarving::resize(&img, 95, 95))
     });
 
     let (w, h) = (160, 90);
@@ -47,18 +42,14 @@ fn criterion_benchmark(c: &mut Criterion) {
             "seamcarving",
             move |b, &i| {
                 let gray_img = black_box(gray_bench_image(w, h));
-                b.iter(||
-                    seamcarving::resize(&gray_img, w - i, h))
+                b.iter(|| seamcarving::resize(&gray_img, w - i, h))
             },
             vec![w / 16, w / 8, w / 4, w / 2, 2 * w / 3],
-        ).with_function(
-            "imageproc",
-            move |b, &i| {
-                let gray_img = black_box(gray_bench_image(w, h));
-                b.iter(||
-                    imageproc::seam_carving::shrink_width(&gray_img, w - i))
-            },
-        ),
+        )
+        .with_function("imageproc", move |b, &i| {
+            let gray_img = black_box(gray_bench_image(w, h));
+            b.iter(|| imageproc::seam_carving::shrink_width(&gray_img, w - i))
+        }),
     );
 }
 

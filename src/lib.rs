@@ -1,7 +1,6 @@
 /// Content-preserving image resizing
 ///
 /// See: [resize]
-
 use image::{GenericImageView, ImageBuffer, Pixel};
 
 use crate::energy::energy_fn;
@@ -10,12 +9,11 @@ use crate::pos::Pos;
 use crate::rotated::Rotated;
 use crate::seamfinder::SeamFinder;
 
-mod rotated;
+mod energy;
 mod matrix;
 mod pos;
-mod energy;
+mod rotated;
 mod seamfinder;
-
 
 /// Resize an image to a lower width and height,
 /// using seam carving to avoid deforming the contents.
@@ -24,7 +22,9 @@ pub fn resize<IMG: GenericImageView>(
     width: u32,
     height: u32,
 ) -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>>
-    where <IMG as GenericImageView>::Pixel: 'static {
+where
+    <IMG as GenericImageView>::Pixel: 'static,
+{
     let Pos(to_remove_x, to_remove_y) = max_pos(img) - Pos(width, height);
     let carved_x = carve(img, to_remove_x);
     let rotated = Rotated(&carved_x);
@@ -38,30 +38,37 @@ fn max_pos<IMG: GenericImageView>(img: &IMG) -> Pos {
 }
 
 struct Carvable<'a, IMG: GenericImageView>
-    where <IMG as GenericImageView>::Pixel: 'static {
+where
+    <IMG as GenericImageView>::Pixel: 'static,
+{
     carved: Carved<'a, IMG>,
     seam_finder: SeamFinder,
 }
 
 impl<'a, IMG: GenericImageView> Carvable<'a, IMG>
-    where <IMG as GenericImageView>::Pixel: 'static {
+where
+    <IMG as GenericImageView>::Pixel: 'static,
+{
     fn new(img: &'a IMG) -> Self {
         let carved = Carved::new(img);
         let seam_finder = SeamFinder::new(max_pos(img));
-        Carvable { carved, seam_finder }
+        Carvable {
+            carved,
+            seam_finder,
+        }
     }
     fn remove_seam(&mut self) {
         let img = &self.carved;
-        let seam = self.seam_finder.extract_seam(
-            |p| energy_fn(img, p)
-        );
+        let seam = self.seam_finder.extract_seam(|p| energy_fn(img, p));
         self.carved.remove_seam(&seam);
     }
 }
 
 /// An image with some vertical seams carved
 struct Carved<'a, IMG: GenericImageView>
-    where <IMG as GenericImageView>::Pixel: 'static {
+where
+    <IMG as GenericImageView>::Pixel: 'static,
+{
     img: &'a IMG,
     removed: u32,
     // pos_aliases is a matrix such as img[x,y] = self[pos_aliases[x,y],y]
@@ -69,11 +76,17 @@ struct Carved<'a, IMG: GenericImageView>
 }
 
 impl<'a, IMG: GenericImageView> Carved<'a, IMG>
-    where <IMG as GenericImageView>::Pixel: 'static {
+where
+    <IMG as GenericImageView>::Pixel: 'static,
+{
     fn new(img: &'a IMG) -> Self {
         let size = max_pos(img);
         let pos_aliases = Matrix::from_fn(size, |x, _y| x as u32);
-        Carved { img, removed: 0, pos_aliases }
+        Carved {
+            img,
+            removed: 0,
+            pos_aliases,
+        }
     }
     fn remove_seam(&mut self, seam: &[Pos]) {
         self.pos_aliases.remove_seam(seam);
@@ -88,14 +101,14 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
     }
 }
 
-fn image_view_to_buffer<IMG: GenericImageView>(img: &IMG)
-                                               -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>>
-    where <IMG as GenericImageView>::Pixel: 'static
+fn image_view_to_buffer<IMG: GenericImageView>(
+    img: &IMG,
+) -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>>
+where
+    <IMG as GenericImageView>::Pixel: 'static,
 {
     let (w, h) = img.dimensions();
-    ImageBuffer::from_fn(w, h, |x, y| {
-        img.get_pixel(x, y)
-    })
+    ImageBuffer::from_fn(w, h, |x, y| img.get_pixel(x, y))
 }
 
 impl<'a, IMG: GenericImageView> GenericImageView for Carved<'a, IMG> {
@@ -125,11 +138,10 @@ impl<'a, IMG: GenericImageView> GenericImageView for Carved<'a, IMG> {
     }
 }
 
-fn carve<IMG: GenericImageView>(
-    img: &IMG,
-    pixel_count: u32,
-) -> Carved<IMG>
-    where <IMG as GenericImageView>::Pixel: 'static {
+fn carve<IMG: GenericImageView>(img: &IMG, pixel_count: u32) -> Carved<IMG>
+where
+    <IMG as GenericImageView>::Pixel: 'static,
+{
     let mut carvable = Carvable::new(img);
     (0..pixel_count).for_each(|_| carvable.remove_seam());
     carvable.carved
@@ -143,16 +155,15 @@ mod tests {
 
     #[test]
     fn energy_fn_correct() {
-        let img = GrayImage::from_raw(3, 2, vec![
-            3, 1, 4,
-            1, 5, 9,
-        ]).unwrap();
-        let energy = ImageBuffer::from_fn(3, 2, |x, y| {
-            Luma([energy_fn(&img, Pos(x, y))])
-        });
+        let img = GrayImage::from_raw(3, 2, vec![3, 1, 4, 1, 5, 9]).unwrap();
+        let energy = ImageBuffer::from_fn(3, 2, |x, y| Luma([energy_fn(&img, Pos(x, y))]));
         let expected = vec![
-            (2 * 2 + 2 * 2), (1 * 1 + 4 * 4), (5 * 5 + 3 * 3),
-            (2 * 2 + 4 * 4), (4 * 4 + 8 * 8), (5 * 5 + 4 * 4),
+            (2 * 2 + 2 * 2),
+            (1 * 1 + 4 * 4),
+            (5 * 5 + 3 * 3),
+            (2 * 2 + 4 * 4),
+            (4 * 4 + 8 * 8),
+            (5 * 5 + 4 * 4),
         ];
         assert_eq!(energy.into_raw(), expected);
     }

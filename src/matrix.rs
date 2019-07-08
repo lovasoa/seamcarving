@@ -23,18 +23,20 @@ impl<T> Matrix<T> {
         let (width, height) = (size.0 as usize, size.1 as usize);
         let size = width * height;
         let mut contents = Vec::with_capacity(size);
-        contents.extend((0..width * height)
-            .map(|i| f(i % width, i / width)));
+        contents.extend((0..width * height).map(|i| f(i % width, i / width)));
         Matrix { width, contents }
     }
 
     #[inline]
     pub fn remove_seam(&mut self, seam: &[Pos]) {
-        self.contents.chunks_exact_mut(self.width)
+        self.contents
+            .chunks_exact_mut(self.width)
             .zip(seam.iter().rev())
             .for_each(|(aliases, &Pos(x, _y))| {
                 let end = &mut aliases[x as usize..];
-                if !end.is_empty() { end.rotate_left(1) }
+                if !end.is_empty() {
+                    end.rotate_left(1)
+                }
             });
     }
 }
