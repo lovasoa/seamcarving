@@ -1,15 +1,16 @@
+#![type_length_limit="1814752"]
+
 /// Content-preserving image resizing
 ///
 /// See: [resize]
 
 use image::{GenericImageView, ImageBuffer, Pixel};
-use pathfinding::prelude::dijkstra;
 
 use crate::energy::energy_fn;
 use crate::matrix::Matrix;
 use crate::pos::Pos;
 use crate::rotated::Rotated;
-use smallvec::SmallVec;
+use crate::seamfinder::SeamFinder;
 
 mod rotated;
 mod matrix;
@@ -38,6 +39,28 @@ fn max_pos<IMG: GenericImageView>(img: &IMG) -> Pos {
     Pos(img.width(), img.height())
 }
 
+struct Carvable<'a, IMG: GenericImageView>
+    where <IMG as GenericImageView>::Pixel: 'static {
+    carved: Carved<'a, IMG>,
+    seam_finder: SeamFinder,
+}
+
+impl<'a, IMG: GenericImageView> Carvable<'a, IMG>
+    where <IMG as GenericImageView>::Pixel: 'static {
+    fn new(img: &'a IMG) -> Self {
+        let carved = Carved::new(img);
+        let seam_finder = SeamFinder::new(max_pos(img));
+        Carvable { carved, seam_finder }
+    }
+    fn remove_seam(&mut self) {
+        let img = &self.carved;
+        let seam = self.seam_finder.extract_seam(
+            |p| energy_fn(img, p)
+        );
+        self.carved.remove_seam(&seam);
+    }
+}
+
 /// An image with some vertical seams carved
 struct Carved<'a, IMG: GenericImageView>
     where <IMG as GenericImageView>::Pixel: 'static {
@@ -45,7 +68,6 @@ struct Carved<'a, IMG: GenericImageView>
     removed: u32,
     // pos_aliases is a matrix such as img[x,y] = self[pos_aliases[x,y],y]
     pos_aliases: Matrix<u32>,
-    energy_cache: Matrix<Option<u32>>, // The energy is computed lazily, hence the Option
 }
 
 impl<'a, IMG: GenericImageView> Carved<'a, IMG>
@@ -53,26 +75,11 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
     fn new(img: &'a IMG) -> Self {
         let size = max_pos(img);
         let pos_aliases = Matrix::from_fn(size, |x, _y| x as u32);
-        let energy = Matrix::from_fn(size, |_x, _y| None);
-        Carved { img, removed: 0, pos_aliases, energy_cache: energy }
+        Carved { img, removed: 0, pos_aliases }
     }
     fn remove_seam(&mut self, seam: &[Pos]) {
-        let last = max_pos(self);
-        seam.iter().for_each(|&pos| { // invalidate the energy cache around the seam
-            pos.surrounding().iter()
-                .filter(|&p| p.before(last))
-                .for_each(|&p| { self.energy_cache[p] = None; })
-        });
         self.pos_aliases.remove_seam(seam);
-        self.energy_cache.remove_seam(seam);
         self.removed += 1;
-    }
-    fn energy(&mut self, pos: Pos) -> u32 {
-        self.energy_cache[pos].unwrap_or_else(|| {
-            let computed = energy_fn(self, pos);
-            self.energy_cache[pos] = Some(computed);
-            computed
-        })
     }
     /// Given a position in the carved image, return a position in the original
     #[inline(always)]
@@ -120,43 +127,14 @@ impl<'a, IMG: GenericImageView> GenericImageView for Carved<'a, IMG> {
     }
 }
 
-/// Carve one vertical seam in the image
-fn carve_one<IMG: GenericImageView>(carved: &mut Carved<IMG>) {
-    let (w, h) = carved.dimensions();
-    let start_pos = Pos(w + 1, 0);
-    // Avoid checking for the empty image case in the hot path
-    let seam: Vec<Pos> = if h == 0 { vec![] } else {
-        let (seam, _cost): (Vec<Pos>, u32) = dijkstra(
-            &start_pos,
-            |&pos| -> SmallVec<[(Pos, u32); 3]>{
-                if pos == start_pos {
-                    let mut v = SmallVec::with_capacity(w as usize);
-                    v.extend((0..w).map(|x| (
-                        Pos(x, 0),
-                        carved.energy(Pos(x, 0))
-                    )));
-                    v
-                } else {
-                    pos.successors(w, h)
-                        .map(|pos| (pos, carved.energy(pos)))
-                        .collect()
-                }
-            },
-            |&Pos(_x,y)| y + 1 == h,
-        ).expect("No seam found. This is a bug in seamcarving");
-        seam.into_iter().skip(1).collect()
-    };
-    carved.remove_seam(&seam);
-}
-
 fn carve<IMG: GenericImageView>(
     img: &IMG,
     pixel_count: u32,
 ) -> Carved<IMG>
     where <IMG as GenericImageView>::Pixel: 'static {
-    let mut carved = Carved::new(img);
-    (0..pixel_count).for_each(|_| carve_one(&mut carved));
-    carved
+    let mut carvable = Carvable::new(img);
+    (0..pixel_count).for_each(|_| carvable.remove_seam());
+    carvable.carved
 }
 
 #[cfg(test)]

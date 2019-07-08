@@ -34,6 +34,8 @@ impl SeamFinder {
                 Some(self.contents[pos].take().expect("should be filled").predecessor)
             }
         }));
+        self.size.0 -= 1;
+        self.contents.remove_seam(&seam);
         seam
     }
 
