@@ -1,6 +1,6 @@
 use std::env;
-use std::path::PathBuf;
 use std::error::Error;
+use std::path::PathBuf;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
@@ -13,13 +13,21 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let input_image = image::open(&image_path)?;
     let resized = seamcarving::resize(&input_image, width, height);
-    let output_path = image_path.with_file_name(
-        format!("{}_resized.{}",
-                image_path.file_stem().expect("invalid file name").to_string_lossy(),
-                image_path.extension().expect("invalid file extension").to_string_lossy()
-        )
-    );
+    let output_path = image_path.with_file_name(format!(
+        "{}_resized.{}",
+        image_path
+            .file_stem()
+            .expect("invalid file name")
+            .to_string_lossy(),
+        image_path
+            .extension()
+            .expect("invalid file extension")
+            .to_string_lossy()
+    ));
     resized.save(&output_path)?;
-    println!("Resized image successfully written to {}", output_path.to_string_lossy());
+    println!(
+        "Resized image successfully written to {}",
+        output_path.to_string_lossy()
+    );
     Ok(())
 }

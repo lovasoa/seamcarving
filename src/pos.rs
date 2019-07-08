@@ -9,6 +9,7 @@ impl Pos {
     pub fn before(self, max: Pos) -> bool {
         self.0 < max.0 && self.1 < max.1
     }
+
     pub fn successors(self, size: Pos) -> PosLine {
         let Pos(x0, y0) = self;
         let x_end = (x0 + 1).min(size.0 - 1);
@@ -37,28 +38,33 @@ impl Pos {
                 if x == end.0 {
                     x = start.0;
                     y += 1;
-                    if y == end.1 { return None; }
+                    if y == end.1 {
+                        return None;
+                    }
                 }
                 Some(Pos(x, y))
-            })
+            },
+        )
     }
 
     /// Returns the top,bottom,left and right positions, in this order
     pub fn surrounding(self) -> [Pos; 4] {
         let Pos(x, y) = self;
         [
-            Pos(x, y.saturating_sub(1)), Pos(x, y + 1),
-            Pos(x.saturating_sub(1), y), Pos(x + 1, y)
+            Pos(x, y.saturating_sub(1)),
+            Pos(x, y + 1),
+            Pos(x.saturating_sub(1), y),
+            Pos(x + 1, y),
         ]
     }
 }
-
 
 pub(crate) struct PosLine { x: u32, y: u32, x_end: u32 }
 
 impl Iterator for PosLine {
     type Item = Pos;
 
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.x > self.x_end { None } else {
             let p = Pos(self.x, self.y);
