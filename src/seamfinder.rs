@@ -112,10 +112,16 @@ mod tests {
         // 0  1  2
         let s1 = finder.extract_seam(energy_fn);
         assert_eq!(s1, vec![Pos(0, 1), Pos(0, 0)]);
-        let s2 = finder.extract_seam(energy_fn);
-        assert_eq!(s2, vec![Pos(0, 1), Pos(0, 0)]);
-        let s3 = finder.extract_seam(energy_fn);
-        assert_eq!(s3, vec![Pos(0, 1), Pos(0, 0)]);
+    }
+
+    #[test]
+    fn larger_image_1024x256() {
+        let (w, h) = (1024, 256);
+        let mut finder = SeamFinder::new(Pos(w, h));
+        let energy_fn = |Pos(x, _y)| x;
+        let s1 = finder.extract_seam(energy_fn);
+        let expected: Vec<_> = (0..h).rev().map(|y| Pos(0, y)).collect();
+        assert_eq!(s1, expected);
     }
 
     #[test]
