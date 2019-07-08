@@ -18,7 +18,7 @@ impl SeamFinder {
         SeamFinder { size, contents }
     }
 
-    pub fn extract_seam<F: FnMut(Pos) -> u32>(&mut self, mut energy: F) -> Vec<Pos> {
+    pub fn extract_seam<F: FnMut(Pos) -> u32>(&mut self, energy: F) -> Vec<Pos> {
         self.fill(energy);
         let mut seam = Vec::with_capacity(self.size.1 as usize);
         // Find the bottom pixel with the lowest energy
