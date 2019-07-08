@@ -2,6 +2,7 @@ use std::ops::{Index, IndexMut};
 
 use crate::Pos;
 
+#[derive(Debug)]
 pub(crate) struct Matrix<T> {
     width: usize,
     contents: Vec<T>,

@@ -37,7 +37,7 @@ impl Pos {
     }
 
     pub fn iter_in_rect(end: Pos) -> impl Iterator<Item=Pos> {
-        (0..end.0 * end.1)
+        (0..(end.0 * end.1))
             .map(move |i| Pos(i % end.0, i / end.0))
     }
 

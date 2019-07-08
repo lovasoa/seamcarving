@@ -2,11 +2,13 @@ use crate::pos::Pos;
 use crate::matrix::Matrix;
 use std::iter::successors;
 
+#[derive(Debug)]
 pub(crate) struct SeamFinder {
     size: Pos,
     contents: Matrix<Option<SeamElem>>,
 }
 
+#[derive(Debug)]
 struct SeamElem {
     predecessor: Pos,
     energy: u32,
@@ -26,13 +28,19 @@ impl SeamFinder {
         let init = (0..self.size.0)
             .flat_map(|x| bottom_y.map(|y| Pos(x, y)))
             .min_by_key(|&p| {
-                self.contents[p].take().expect("should have been filled").energy
+                self.contents[p].as_ref().expect("should have been filled").energy
             });
         seam.extend(successors(init, |&pos| {
+            dbg!(&self.contents);
+            dbg!(pos);
+            let next = if pos.1 == 0 { None } else {
+                Some(self.contents[pos]
+                    .as_ref()
+                    .expect("should be filled")
+                    .predecessor)
+            };
             self.clear(pos);
-            if pos.1 == 0 { None } else {
-                Some(self.contents[pos].take().expect("should be filled").predecessor)
-            }
+            next
         }));
         self.size.0 -= 1;
         self.contents.remove_seam(&seam);
@@ -66,5 +74,33 @@ impl SeamFinder {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::seamfinder::SeamFinder;
+    use crate::pos::Pos;
+
+    #[test]
+    fn extracts_correct_seam() {
+        let mut finder = SeamFinder::new(Pos(3, 2));
+        let energy_fn = |Pos(x, _y)| x;
+        // energy matrix:
+        // 0  1  2
+        // | \  \
+        // 0  1  2
+        let s1 = finder.extract_seam(energy_fn);
+        assert_eq!(s1, vec![Pos(0, 1), Pos(0, 0)]);
+    }
+
+    #[test]
+    fn fills() {
+        let mut finder = SeamFinder::new(Pos(10, 10));
+        finder.fill(|_| 42);
+        Pos::iter_in_rect(finder.size)
+            .for_each(|p|
+                assert!(finder.contents[p].is_some())
+            )
     }
 }
