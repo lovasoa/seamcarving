@@ -31,7 +31,7 @@ impl<T> Matrix<T> {
     #[inline]
     pub fn remove_seam(&mut self, seam: &[Pos]) {
         self.contents.chunks_exact_mut(self.width)
-            .zip(seam)
+            .zip(seam.iter().rev())
             .for_each(|(aliases, &Pos(x, _y))| {
                 let end = &mut aliases[x as usize..];
                 if !end.is_empty() { end.rotate_left(1) }
