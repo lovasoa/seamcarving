@@ -39,7 +39,7 @@ fn removes_the_right_horizontal_seam() {
 }
 
 #[test]
-fn updates_energy() {
+fn remove_two_seams() {
     let img = GrayImage::from_raw(8, 3, vec![
         7, 9, 9, 0, 0, 0, 9, 5,
         8, 9, 9, 0, 0, 0, 9, 3,

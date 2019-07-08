@@ -56,7 +56,7 @@ impl SeamFinder {
                     } else { None }
                 })
                 .min_by_key(|e| e.energy)
-                .unwrap_or(SeamElem { predecessor: self.size, energy: 0 });
+                .unwrap_or(SeamElem { predecessor: self.size, energy: delta_e });
             self.contents[pos] = Some(elem);
         }
     }
@@ -89,6 +89,8 @@ mod tests {
         // | \  \
         // 0  1  2
         let s1 = finder.extract_seam(energy_fn);
+        assert_eq!(s1, vec![Pos(0, 1), Pos(0, 0)]);
+        let s2 = finder.extract_seam(energy_fn);
         assert_eq!(s1, vec![Pos(0, 1), Pos(0, 0)]);
     }
 
