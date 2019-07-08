@@ -10,9 +10,10 @@ pub(crate) struct Matrix<T> {
 impl<T> Matrix<T> {
     pub fn from_fn(size: Pos, f: fn(x: usize, y: usize) -> T) -> Self {
         let (width, height) = (size.0 as usize, size.1 as usize);
-        let contents = (0..width * height)
-            .map(|i| f(i % width, i / width))
-            .collect();
+        let size = width * height;
+        let mut contents = Vec::with_capacity(size);
+        contents.extend((0..width * height)
+            .map(|i| f(i % width, i / width)));
         Matrix { width, contents }
     }
 
