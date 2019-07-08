@@ -31,8 +31,6 @@ impl SeamFinder {
                 self.contents[p].as_ref().expect("should have been filled").energy
             });
         seam.extend(successors(init, |&pos| {
-            dbg!(&self.contents);
-            dbg!(pos);
             let next = if pos.1 == 0 { None } else {
                 Some(self.contents[pos]
                     .as_ref()
