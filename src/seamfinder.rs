@@ -45,7 +45,7 @@ impl SeamElem {
         SeamElem { predecessor_dx, energy }
     }
     fn predecessor(&self, pos: Pos) -> Pos {
-        let mut p = pos.clone();
+        let mut p = pos;
         if self.predecessor_dx > 0 {
             p.0 += self.predecessor_dx as u32;
         } else {
@@ -102,7 +102,7 @@ impl SeamFinder {
                     } else { None }
                 })
                 .min_by_key(|e| e.energy)
-                .unwrap_or(SeamElem::new(pos, pos, delta_e));
+                .unwrap_or_else(|| SeamElem::new(pos, pos, delta_e));
             self.contents[pos] = Some(elem);
         }
         self.dirty_bounds = DirtyBounds::clean(self.size);
@@ -110,12 +110,11 @@ impl SeamFinder {
 
     /// Recursively invalidates all cached information about a position
     fn clear(&mut self, p: Pos) {
-        let (w, h) = (self.size.0 as u32, self.size.1 as u32);
         self.to_clear.push(p);
         while let Some(pos) = self.to_clear.pop() {
             self.contents[pos] = None;
             self.dirty_bounds.update(pos);
-            for s in pos.successors(w, h) {
+            for s in pos.successors(self.size) {
                 if let Some(e) = &self.contents[s] {
                     if e.predecessor(s) == pos {
                         self.to_clear.push(s)
