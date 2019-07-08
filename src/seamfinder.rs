@@ -34,6 +34,7 @@ impl DirtyBounds {
     fn dirty(size: Pos) -> Self {
         DirtyBounds(0, size.0)
     }
+    #[inline(always)]
     fn update(&mut self, Pos(x, _): Pos) {
         if x < self.0 {
             self.0 = x
@@ -69,18 +70,21 @@ impl SeamElem {
 }
 
 impl PartialEq for SeamElem {
+    #[inline(always)]
     fn eq(&self, other: &Self) -> bool {
         self.energy == other.energy
     }
 }
 
 impl PartialOrd for SeamElem {
+    #[inline(always)]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.energy.partial_cmp(&other.energy)
     }
 }
 
 impl Ord for SeamElem {
+    #[inline(always)]
     fn cmp(&self, other: &Self) -> Ordering {
         self.energy.cmp(&other.energy)
     }
@@ -106,12 +110,8 @@ impl SeamFinder {
         let bottom_y: Option<u32> = self.size.1.checked_sub(1);
         let init = (0..self.size.0)
             .flat_map(|x| bottom_y.map(|y| Pos(x, y)))
-            .min_by_key(|&p| {
-                self.contents[p]
-                    .as_ref()
-                    .expect("should have been filled")
-                    .energy
-            });
+            .min_by_key(|&p|
+                self.contents[p].as_ref().expect("should have been filled"));
         seam.extend(successors(init, |&pos| {
             let next = if pos.1 == 0 {
                 None
