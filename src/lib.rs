@@ -9,6 +9,7 @@ use crate::energy::energy_fn;
 use crate::matrix::Matrix;
 use crate::pos::Pos;
 use crate::rotated::Rotated;
+use smallvec::SmallVec;
 
 mod rotated;
 mod matrix;
@@ -125,13 +126,16 @@ fn carve_one<IMG: GenericImageView>(carved: &mut Carved<IMG>) {
     let seam: Vec<Pos> = if h == 0 { vec![] } else {
         let (seam, _cost): (Vec<Option<Pos>>, u32) = dijkstra(
             &None,
-            |maybe_pos: &Option<Pos>| -> Vec<_>{
+            |maybe_pos: &Option<Pos>| -> SmallVec<[(Option<Pos>, u32); 3]>{
                 match maybe_pos {
-                    None =>
-                        (0..w).map(|x| (
+                    None => {
+                        let mut v = SmallVec::with_capacity(w as usize);
+                        v.extend((0..w).map(|x| (
                             Some(Pos(x, 0)),
                             carved.energy(Pos(x, 0))
-                        )).collect(),
+                        )));
+                        v
+                    }
                     Some(pos) =>
                         pos.successors(w, h)
                             .map(|pos| (Some(pos), carved.energy(pos)))
