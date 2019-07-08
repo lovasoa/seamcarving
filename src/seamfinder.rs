@@ -7,6 +7,7 @@ use crate::pos::Pos;
 pub(crate) struct SeamFinder {
     size: Pos,
     contents: Matrix<Option<SeamElem>>,
+    to_clear: Vec<Pos>,
 }
 
 #[derive(Debug)]
@@ -39,7 +40,8 @@ impl SeamElem {
 impl SeamFinder {
     pub fn new(size: Pos) -> Self {
         let contents: Matrix<Option<SeamElem>> = Matrix::from_fn(size, |_, _| None);
-        SeamFinder { size, contents }
+        let to_clear = Vec::with_capacity(size.1 as usize);
+        SeamFinder { size, contents, to_clear }
     }
 
     pub fn extract_seam<F: FnMut(Pos) -> u32>(&mut self, energy: F) -> Vec<Pos> {
@@ -86,11 +88,14 @@ impl SeamFinder {
     /// Recursively invalidates all cached information about a position
     fn clear(&mut self, p: Pos) {
         let (w, h) = (self.size.0 as u32, self.size.1 as u32);
-        self.contents[p] = None;
-        for s in p.successors(w, h) {
-            if let Some(e) = &self.contents[s] {
-                if e.predecessor(s) == p {
-                    self.clear(s)
+        self.to_clear.push(p);
+        while let Some(pos) = self.to_clear.pop() {
+            self.contents[pos] = None;
+            for s in pos.successors(w, h) {
+                if let Some(e) = &self.contents[s] {
+                    if e.predecessor(s) == pos {
+                        self.to_clear.push(s)
+                    }
                 }
             }
         }
