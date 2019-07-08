@@ -1,11 +1,21 @@
 use std::ops::{Index, IndexMut};
 
 use crate::Pos;
+use std::fmt::{Debug, Formatter};
 
-#[derive(Debug)]
 pub(crate) struct Matrix<T> {
     width: usize,
     contents: Vec<T>,
+}
+
+impl<T: Debug> Debug for Matrix<T> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        writeln!(f, "Matrix {{")?;
+        for line in self.contents.chunks_exact(self.width) {
+            writeln!(f, "  {:?}", line)?;
+        }
+        writeln!(f, "}}")
+    }
 }
 
 impl<T> Matrix<T> {
