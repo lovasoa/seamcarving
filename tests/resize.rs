@@ -7,13 +7,13 @@ fn pi_img_8_3() -> ImageBuffer<Luma<u8>, Vec<u8>> {
         8,
         3,
         vec![
-            // 1  2  3  4  5  5  7
+            // 1  2  3  4  5  6  7
             3, 1, 4, 0, 0, 0, 1, 5, // 0
             9, 2, 6, 0, 0, 0, 5, 3, // 1
             5, 8, 0, 0, 0, 9, 7, 9, // 2
         ],
     )
-    .unwrap()
+        .unwrap()
 }
 
 #[test]
@@ -22,7 +22,12 @@ fn removes_the_right_vertical_seam() {
     assert_eq!(resized.dimensions(), (7, 3));
     assert_eq!(
         resized.into_raw(),
-        vec![3, 1, 4, 0, 0, 1, 5, 9, 2, 6, 0, 0, 5, 3, 5, 8, 0, 0, 9, 7, 9,]
+        vec![
+            // 1  2  3  4  5  6
+            3, 1, 4, 0, 0, 1, 5, // 0
+            9, 2, 6, 0, 0, 5, 3, // 1
+            5, 8, 0, 0, 9, 7, 9, // 2
+        ]
     );
 }
 
@@ -33,7 +38,16 @@ fn removes_the_right_horizontal_seam() {
     assert_eq!(resized_rotated.dimensions(), (3, 7));
     assert_eq!(
         resized_rotated.into_raw(),
-        vec![5, 9, 3, 8, 2, 1, 0, 6, 4, 0, 0, 0, 9, 0, 0, 7, 5, 1, 9, 3, 5]
+        vec![
+            // 1  2
+            5, 9, 3, // 0
+            8, 2, 1, // 1
+            0, 6, 4, // 2
+            0, 0, 0, // 3
+            9, 0, 0, // 4
+            7, 5, 1, // 5
+            9, 3, 5, // 6
+        ]
     );
 }
 
@@ -43,16 +57,23 @@ fn remove_two_seams() {
         8,
         3,
         vec![
-            7, 9, 9, 0, 0, 0, 9, 5, 8, 9, 9, 0, 0, 0, 9, 3, 8, 9, 0, 0, 0, 9, 7, 9,
+            // 1  2  3  4  5  5  7
+            7, 9, 9, 0, 0, 0, 9, 5, // 0
+            8, 9, 9, 0, 0, 0, 9, 3, // 1
+            8, 9, 0, 0, 0, 9, 7, 9, // 2
         ],
-    )
-    .unwrap();
+    ).expect("Unable to create test image");
     let resized = resize(&img, 6, 3);
     assert_eq!(resized.dimensions(), (6, 3));
     assert_eq!(
         resized.into_raw(),
-        vec![7, 9, 0, 0, 9, 5, 8, 9, 0, 0, 9, 3, 9, 0, 0, 9, 7, 9]
-    );
+        vec![
+            // 1  2  3  4  5
+            7, 9, 0, 0, 9, 5, // 0
+            8, 9, 0, 0, 9, 3, // 1
+            9, 0, 0, 9, 7, 9  // 2
+        ]
+    )
 }
 
 #[test]

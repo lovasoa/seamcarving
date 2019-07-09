@@ -59,6 +59,7 @@ impl SeamElem {
         }
     }
 
+    #[inline(always)]
     fn predecessor(&self, pos: Pos) -> Pos {
         let mut p = pos;
         if self.predecessor_dx > 0 {

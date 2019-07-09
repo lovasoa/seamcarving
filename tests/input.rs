@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 fn open_image() -> DynamicImage {
     let path: PathBuf = [
-        Path::new(file!()).parent().unwrap(),
+        Path::new(file!()).parent().expect("no directory"),
         Path::new("input.png")
     ].iter().collect();
     let img = image::open(path)
