@@ -1,30 +1,46 @@
-/// Content-preserving image resizing
-///
-/// See: [resize]
+//! ## Content-preserving image resizing in rust
+//!
+//! The main function of this crate is [resize]:
+//! it takes an image, and removes horizontal and vertical seams
+//! until it fits a given size.
+//!
 use image::{GenericImageView, ImageBuffer, Pixel};
 
+pub use crate::carved::Carved;
 use crate::energy::energy_fn;
 use crate::pos::Pos;
 use crate::rotated::Rotated;
 use crate::seam_finder::SeamFinder;
-use crate::carved::Carved;
 
+mod carved;
 mod energy;
 mod matrix;
 mod pos;
 mod rotated;
 mod seam_finder;
-mod carved;
 
 /// Resize an image to a lower width and height,
 /// using seam carving to avoid deforming the contents.
+///
+/// This works by removing horizontal and then vertical seams
+/// until both the width and the height of the image
+/// are inferior to the given dimensions.
+///
+/// Im the image is already smaller than the given dimensions,
+/// then returned image is identical to the input.
+///
+/// ```no_run
+/// let img = image::open("./my_image.jpg").unwrap();
+/// let resized = seamcarving::resize(&img, 100, 100); // Creates a 100x100 version of the image
+/// resized.save("./resized.jpg");
+/// ```
 pub fn resize<IMG: GenericImageView>(
     img: &IMG,
     width: u32,
     height: u32,
 ) -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>>
-    where
-        <IMG as GenericImageView>::Pixel: 'static,
+where
+    <IMG as GenericImageView>::Pixel: 'static,
 {
     let Pos(to_remove_x, to_remove_y) = max_pos(img) - Pos(width, height);
     let carved_x = carve(img, to_remove_x);
@@ -38,14 +54,21 @@ fn max_pos<IMG: GenericImageView>(img: &IMG) -> Pos {
     Pos(img.width(), img.height())
 }
 
-struct Carvable<'a, IMG: GenericImageView>
-    where <IMG as GenericImageView>::Pixel: 'a {
+/// A structure that allows removing vertical seams of content
+/// from an image
+pub struct Carvable<'a, IMG: GenericImageView>
+where
+    <IMG as GenericImageView>::Pixel: 'a,
+{
     carved: Carved<'a, IMG>,
     seam_finder: SeamFinder,
 }
 
 impl<'a, IMG: GenericImageView> Carvable<'a, IMG> {
-    fn new(img: &'a IMG) -> Self {
+    /// Creates a new proxy object that will allow reducing an image width.
+    /// Notice that it does not take a mutable pointer.
+    /// The underlying image itself is untouched
+    pub fn new(img: &'a IMG) -> Self {
         let carved = Carved::new(img);
         let seam_finder = SeamFinder::new(max_pos(img));
         Carvable {
@@ -53,28 +76,34 @@ impl<'a, IMG: GenericImageView> Carvable<'a, IMG> {
             seam_finder,
         }
     }
-    fn remove_seam(&mut self) {
+    /// Remove a vertical seam from the image,
+    /// diminishing it's width by 1.
+    pub fn remove_seam(&mut self) {
         let img = &self.carved;
-        let seam = self.seam_finder.extract_seam(
-            |p| energy_fn(img, p));
+        let seam = self.seam_finder.extract_seam(|p| energy_fn(img, p));
         self.carved.remove_seam(&seam);
+    }
+    /// Get the resulting carved image
+    pub fn result(&self) -> &Carved<'a, IMG> {
+        &self.carved
     }
 }
 
-
-fn image_view_to_buffer<IMG: GenericImageView>(
-    img: &IMG
+/// Converts [GenericImageView](GenericImageView)
+/// to an [ImageBuffer](ImageBuffer)
+pub fn image_view_to_buffer<IMG: GenericImageView>(
+    img: &IMG,
 ) -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>>
-    where <IMG as GenericImageView>::Pixel: 'static,
+where
+    <IMG as GenericImageView>::Pixel: 'static,
 {
     let (w, h) = img.dimensions();
     ImageBuffer::from_fn(w, h, |x, y| img.get_pixel(x, y))
 }
 
-
 fn carve<IMG: GenericImageView>(img: &IMG, pixel_count: u32) -> Carved<IMG>
-    where
-        <IMG as GenericImageView>::Pixel: 'static,
+where
+    <IMG as GenericImageView>::Pixel: 'static,
 {
     let mut carvable = Carvable::new(img);
     (0..pixel_count).for_each(|_| carvable.remove_seam());

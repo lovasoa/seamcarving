@@ -1,10 +1,13 @@
-use image::GenericImageView;
 use crate::matrix::Matrix;
 use crate::max_pos;
 use crate::pos::Pos;
+use image::GenericImageView;
 
-/// An image with some vertical seams carved
-pub(crate) struct Carved<'a, IMG: GenericImageView> {
+/// An image with some vertical seams carved.
+/// If you want to save this image or otherwise manipulate it,
+/// you can convert it to a [ImageBuffer](image::ImageBuffer)
+/// using [image_view_to_buffer](crate::image_view_to_buffer)
+pub struct Carved<'a, IMG: GenericImageView> {
     img: &'a IMG,
     removed: u32,
     // pos_aliases is a matrix such as img[x,y] = self[pos_aliases[x,y],y]
@@ -34,9 +37,10 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG> {
     }
 }
 
-
 impl<'a, IMG: GenericImageView> GenericImageView for Carved<'a, IMG>
-    where <IMG as GenericImageView>::Pixel: 'a {
+where
+    <IMG as GenericImageView>::Pixel: 'a,
+{
     type Pixel = IMG::Pixel;
     type InnerImageView = IMG::InnerImageView;
 
