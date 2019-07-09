@@ -1,5 +1,4 @@
 use std::ops::{Sub, Add};
-use std::iter::successors;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub(crate) struct Pos(pub u32, pub u32);
@@ -29,22 +28,8 @@ impl Pos {
         PosLine { x, y, x_end }
     }
 
-    pub fn iter_in_rect(start: Pos, end: Pos) -> impl Iterator<Item=Pos> {
-        successors(
-            if start.before(end) { Some(start) } else { None },
-            move |&pos| {
-                let Pos(mut x, mut y) = pos;
-                x += 1;
-                if x == end.0 {
-                    x = start.0;
-                    y += 1;
-                    if y == end.1 {
-                        return None;
-                    }
-                }
-                Some(Pos(x, y))
-            },
-        )
+    pub fn iter_in_rect(start: Pos, end: Pos) -> RectIterator {
+        RectIterator { current: start, start, end }
     }
 
     /// Returns the top,bottom,left and right positions, in this order
@@ -70,6 +55,31 @@ impl Iterator for PosLine {
             let p = Pos(self.x, self.y);
             self.x += 1;
             Some(p)
+        }
+    }
+}
+
+pub(crate) struct RectIterator {
+    current: Pos,
+    start: Pos,
+    end: Pos,
+}
+
+impl Iterator for RectIterator {
+    type Item = Pos;
+
+    #[inline(always)]
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current.1 == self.end.1 {
+            None
+        } else {
+            let pos = self.current;
+            self.current.0 += 1;
+            if self.current.0 == self.end.0 {
+                self.current.0 = self.start.0;
+                self.current.1 += 1;
+            }
+            Some(pos)
         }
     }
 }
