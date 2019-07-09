@@ -39,17 +39,12 @@ fn max_pos<IMG: GenericImageView>(img: &IMG) -> Pos {
 }
 
 struct Carvable<'a, IMG: GenericImageView>
-    where
-        <IMG as GenericImageView>::Pixel: 'static,
-{
+    where <IMG as GenericImageView>::Pixel: 'a {
     carved: Carved<'a, IMG>,
     seam_finder: SeamFinder,
 }
 
-impl<'a, IMG: GenericImageView> Carvable<'a, IMG>
-    where
-        <IMG as GenericImageView>::Pixel: 'static,
-{
+impl<'a, IMG: GenericImageView> Carvable<'a, IMG> {
     fn new(img: &'a IMG) -> Self {
         let carved = Carved::new(img);
         let seam_finder = SeamFinder::new(max_pos(img));
@@ -68,10 +63,9 @@ impl<'a, IMG: GenericImageView> Carvable<'a, IMG>
 
 
 fn image_view_to_buffer<IMG: GenericImageView>(
-    img: &IMG,
+    img: &IMG
 ) -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>>
-    where
-        <IMG as GenericImageView>::Pixel: 'static,
+    where <IMG as GenericImageView>::Pixel: 'static,
 {
     let (w, h) = img.dimensions();
     ImageBuffer::from_fn(w, h, |x, y| img.get_pixel(x, y))

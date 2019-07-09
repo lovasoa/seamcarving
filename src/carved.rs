@@ -4,20 +4,14 @@ use crate::max_pos;
 use crate::pos::Pos;
 
 /// An image with some vertical seams carved
-pub(crate) struct Carved<'a, IMG: GenericImageView>
-    where
-        <IMG as GenericImageView>::Pixel: 'static,
-{
+pub(crate) struct Carved<'a, IMG: GenericImageView> {
     img: &'a IMG,
     removed: u32,
     // pos_aliases is a matrix such as img[x,y] = self[pos_aliases[x,y],y]
     pos_aliases: Matrix<u32>,
 }
 
-impl<'a, IMG: GenericImageView> Carved<'a, IMG>
-    where
-        <IMG as GenericImageView>::Pixel: 'static,
-{
+impl<'a, IMG: GenericImageView> Carved<'a, IMG> {
     pub(crate) fn new(img: &'a IMG) -> Self {
         let size = max_pos(img);
         let pos_aliases = Matrix::from_fn(size, |x, _y| x as u32);
@@ -41,7 +35,8 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG>
 }
 
 
-impl<'a, IMG: GenericImageView> GenericImageView for Carved<'a, IMG> {
+impl<'a, IMG: GenericImageView> GenericImageView for Carved<'a, IMG>
+    where <IMG as GenericImageView>::Pixel: 'a {
     type Pixel = IMG::Pixel;
     type InnerImageView = IMG::InnerImageView;
 
