@@ -51,24 +51,16 @@ impl SeamElem {
     }
 
     #[inline(always)]
-    fn set_dx(&mut self, Pos(x_current, _): Pos, Pos(x_predecessor, _): Pos) {
-        self.predecessor_dx = if x_predecessor > x_current {
-            (x_predecessor - x_current) as i8
-        } else {
-            -((x_current - x_predecessor) as i8)
-        }
+    fn set_dx(&mut self, current: Pos, predecessor: Pos) {
+        self.predecessor_dx = predecessor.0.wrapping_sub(current.0) as i8
     }
 
     #[inline(always)]
     fn predecessor(&self, pos: Pos) -> Pos {
-        let mut p = pos;
-        if self.predecessor_dx > 0 {
-            p.0 += self.predecessor_dx as u32;
-        } else {
-            p.0 -= (-self.predecessor_dx) as u32;
-        }
-        p.1 -= 1;
-        p
+        Pos(
+            pos.0.wrapping_add(self.predecessor_dx as u32),
+            pos.1 - 1,
+        )
     }
 }
 
