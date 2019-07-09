@@ -12,13 +12,11 @@ edition = "2018"
 
 [dependencies]
 image = "0.21"
-pathfinding = "1.1"
 num-traits = "0.2"
-smallvec = "0.6"
 
 [dev-dependencies]
 criterion = "0.2"
-imageproc = "0.18.0"
+imageproc = "0.18"
 
 [badges]
 travis-ci = { repository = "lovasoa/seamcarving" }

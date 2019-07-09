@@ -30,8 +30,8 @@ pub fn resize<IMG: GenericImageView>(
     let carved_x = carve(img, to_remove_x);
     let rotated = Rotated(&carved_x);
     let carved_y = carve(&rotated, to_remove_y);
-    let rerotated = Rotated(&carved_y);
-    image_view_to_buffer(&rerotated)
+    let re_rotated = Rotated(&carved_y);
+    image_view_to_buffer(&re_rotated)
 }
 
 fn max_pos<IMG: GenericImageView>(img: &IMG) -> Pos {
@@ -60,7 +60,8 @@ impl<'a, IMG: GenericImageView> Carvable<'a, IMG>
     }
     fn remove_seam(&mut self) {
         let img = &self.carved;
-        let seam = self.seam_finder.extract_seam(|p| energy_fn(img, p));
+        let seam = self.seam_finder.extract_seam(
+            |p| energy_fn(img, p));
         self.carved.remove_seam(&seam);
     }
 }
