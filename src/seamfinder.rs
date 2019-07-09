@@ -2,7 +2,6 @@ use std::iter::successors;
 
 use crate::matrix::Matrix;
 use crate::pos::Pos;
-use std::cmp::Ordering;
 
 #[derive(Debug)]
 pub(crate) struct SeamFinder {
@@ -18,7 +17,7 @@ pub(crate) struct SeamFinder {
     dirty_bounds: DirtyBounds,
 }
 
-#[derive(Debug, Eq)]
+#[derive(Debug)]
 struct SeamElem {
     predecessor_dx: i8,
     energy: u32,
@@ -46,17 +45,20 @@ impl DirtyBounds {
 }
 
 impl SeamElem {
-    fn new(Pos(x_current, _): Pos, Pos(x_predecessor, _): Pos, energy: u32) -> Self {
-        let predecessor_dx = if x_predecessor > x_current {
+    #[inline(always)]
+    fn new(energy: u32) -> Self {
+        SeamElem { predecessor_dx: 0, energy }
+    }
+
+    #[inline(always)]
+    fn set_dx(&mut self, Pos(x_current, _): Pos, Pos(x_predecessor, _): Pos) {
+        self.predecessor_dx = if x_predecessor > x_current {
             (x_predecessor - x_current) as i8
         } else {
             -((x_current - x_predecessor) as i8)
-        };
-        SeamElem {
-            predecessor_dx,
-            energy,
         }
     }
+
     fn predecessor(&self, pos: Pos) -> Pos {
         let mut p = pos;
         if self.predecessor_dx > 0 {
@@ -66,27 +68,6 @@ impl SeamElem {
         }
         p.1 -= 1;
         p
-    }
-}
-
-impl PartialEq for SeamElem {
-    #[inline(always)]
-    fn eq(&self, other: &Self) -> bool {
-        self.energy == other.energy
-    }
-}
-
-impl PartialOrd for SeamElem {
-    #[inline(always)]
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.energy.partial_cmp(&other.energy)
-    }
-}
-
-impl Ord for SeamElem {
-    #[inline(always)]
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.energy.cmp(&other.energy)
     }
 }
 
@@ -111,17 +92,15 @@ impl SeamFinder {
         let init = (0..self.size.0)
             .flat_map(|x| bottom_y.map(|y| Pos(x, y)))
             .min_by_key(|&p|
-                self.contents[p].as_ref().expect("should have been filled"));
+                self.contents[p].as_ref().expect("should have been filled").energy);
         seam.extend(successors(init, |&pos| {
             let next = if pos.1 == 0 {
                 None
             } else {
-                Some(
-                    self.contents[pos]
-                        .as_ref()
-                        .expect("should be filled")
-                        .predecessor(pos),
-                )
+                Some(self.contents[pos]
+                    .as_ref()
+                    .expect("should be filled")
+                    .predecessor(pos))
             };
             self.clear(pos);
             next
@@ -139,18 +118,20 @@ impl SeamFinder {
                 continue;
             }
             let delta_e = energy(pos);
-            let elem = pos
-                .predecessors(self.size)
-                .flat_map(|predecessor| {
-                    if let Some(e) = &self.contents[predecessor] {
-                        Some(SeamElem::new(pos, predecessor, e.energy + delta_e))
-                    } else {
-                        None
+            let mut best_elem = SeamElem::new(std::u32::MAX);
+            for predecessor in pos.predecessors(self.size) {
+                if let Some(e) = &self.contents[predecessor] {
+                    let energy = e.energy + delta_e;
+                    if energy < best_elem.energy {
+                        best_elem.energy = energy;
+                        best_elem.set_dx(pos, predecessor);
                     }
-                })
-                .min()
-                .unwrap_or_else(|| SeamElem::new(pos, pos, delta_e));
-            self.contents[pos] = Some(elem);
+                }
+            }
+            if best_elem.energy == std::u32::MAX { // We are on the top row
+                best_elem.energy = delta_e;
+            }
+            self.contents[pos] = Some(best_elem);
         }
         self.dirty_bounds = DirtyBounds::clean(self.size);
     }
