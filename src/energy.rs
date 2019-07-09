@@ -1,27 +1,33 @@
 use crate::max_pos;
 use crate::pos::Pos;
 use image::{GenericImageView, Pixel};
+use num_traits::ToPrimitive;
 
 pub(crate) fn energy_fn<IMG: GenericImageView>(img: &IMG, pos: Pos) -> u32 {
-    use num_traits::cast::ToPrimitive;
-    let [top, bottom, left, right] = pos.surrounding();
     let last_pos = max_pos(img);
-    [(top, bottom), (left, right)]
-        .iter()
-        .map(|&(prev, next)| -> u32 {
-            let next = if next.before(last_pos) { next } else { pos };
-            let p1 = img.get_pixel(next.0, next.1);
-            let p2 = img.get_pixel(prev.0, prev.1);
-            p1.channels()
-                .iter()
-                .zip(p2.channels())
-                .map(|(&a, &b)| {
-                    let a = a.to_u32().unwrap_or(u32::max_value());
-                    let b = b.to_u32().unwrap_or(u32::max_value());
-                    let diff = if a > b { a - b } else { b - a };
-                    diff * diff
-                })
-                .sum()
-        })
-        .sum()
+    let [top, bottom, left, right] = pos.surrounding(last_pos);
+    let top_px = img.get_pixel(top.0, top.1);
+    let bottom_px = img.get_pixel(bottom.0, bottom.1);
+    let left_px = img.get_pixel(left.0, left.1);
+    let right_px = img.get_pixel(right.0, right.1);
+    square_diff_px(top_px, bottom_px) +
+        square_diff_px(left_px, right_px)
+}
+
+fn square_diff_px<P: Pixel>(p1: P, p2: P) -> u32 {
+    let (ch1, ch2) = (p1.channels(), p2.channels());
+    let count = <P as Pixel>::channel_count() as usize;
+    let mut sum = 0;
+    for i in 0..count {
+        sum += square_diff(ch1[i], ch2[i]);
+    }
+    sum
+}
+
+#[inline]
+fn square_diff<T: ToPrimitive>(a: T, b: T) -> u32 {
+    let a = a.to_u32().unwrap_or(u32::max_value());
+    let b = b.to_u32().unwrap_or(u32::max_value());
+    let diff = if a > b { a - b } else { b - a };
+    diff * diff
 }

@@ -4,11 +4,6 @@ use std::ops::{Sub, Add};
 pub(crate) struct Pos(pub u32, pub u32);
 
 impl Pos {
-    #[inline(always)]
-    pub fn before(self, max: Pos) -> bool {
-        self.0 < max.0 && self.1 < max.1
-    }
-
     pub fn successors(self, size: Pos) -> PosLine {
         let Pos(x0, y0) = self;
         let x_end = (x0 + 1).min(size.0 - 1);
@@ -33,13 +28,13 @@ impl Pos {
     }
 
     /// Returns the top,bottom,left and right positions, in this order
-    pub fn surrounding(self) -> [Pos; 4] {
+    pub fn surrounding(self, size: Pos) -> [Pos; 4] {
         let Pos(x, y) = self;
         [
             Pos(x, y.saturating_sub(1)),
-            Pos(x, y + 1),
+            Pos(x, (y + 1).min(size.1 - 1)),
             Pos(x.saturating_sub(1), y),
-            Pos(x + 1, y),
+            Pos((x + 1).min(size.0 - 1), y),
         ]
     }
 }
