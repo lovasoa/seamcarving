@@ -157,7 +157,7 @@ impl SeamFinder {
 #[cfg(test)]
 mod tests {
     use crate::pos::Pos;
-    use crate::seamfinder::SeamFinder;
+    use crate::seam_finder::SeamFinder;
 
     #[test]
     fn extracts_correct_seam() {
