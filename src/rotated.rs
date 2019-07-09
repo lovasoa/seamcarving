@@ -1,9 +1,12 @@
 use image::GenericImageView;
 
-/// Represents an image with the x and y coordinates reversed
-/// In geometric terms, the operation is the combination of a 90° rotation and a symmetry along the Y axis
+/// Represents an image with the x and y coordinates reversed.
+///
+/// In geometric terms, the operation is the combination of a 90° rotation
+/// and a symmetry along the Y axis.
+///
 /// This operation is idempotent: Rotated(Rotated(img)) = img
-pub(crate) struct Rotated<'a, IMG: GenericImageView>(pub &'a IMG);
+pub struct Rotated<'a, IMG: GenericImageView>(pub &'a IMG);
 
 impl<'a, IMG: GenericImageView> GenericImageView for Rotated<'a, IMG> {
     type Pixel = IMG::Pixel;

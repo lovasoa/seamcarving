@@ -9,7 +9,7 @@ use image::{GenericImageView, ImageBuffer, Pixel};
 pub use crate::carved::Carved;
 use crate::energy::energy_fn;
 use crate::pos::Pos;
-use crate::rotated::Rotated;
+pub use crate::rotated::Rotated;
 use crate::seam_finder::SeamFinder;
 
 mod carved;
@@ -19,15 +19,15 @@ mod pos;
 mod rotated;
 mod seam_finder;
 
-/// Resize an image to a lower width and height,
+/// Resizes an image to a lower width and height,
 /// using seam carving to avoid deforming the contents.
 ///
 /// This works by removing horizontal and then vertical seams
 /// until both the width and the height of the image
 /// are inferior to the given dimensions.
 ///
-/// Im the image is already smaller than the given dimensions,
-/// then returned image is identical to the input.
+/// If the image is already smaller than the given dimensions,
+/// then the returned image is identical to the input.
 ///
 /// ```no_run
 /// let img = image::open("./my_image.jpg").unwrap();
@@ -67,7 +67,7 @@ where
 impl<'a, IMG: GenericImageView> Carvable<'a, IMG> {
     /// Creates a new proxy object that will allow reducing an image width.
     /// Notice that it does not take a mutable pointer.
-    /// The underlying image itself is untouched
+    /// The underlying image itself is untouched.
     pub fn new(img: &'a IMG) -> Self {
         let carved = Carved::new(img);
         let seam_finder = SeamFinder::new(max_pos(img));
@@ -76,8 +76,8 @@ impl<'a, IMG: GenericImageView> Carvable<'a, IMG> {
             seam_finder,
         }
     }
-    /// Remove a vertical seam from the image,
-    /// diminishing it's width by 1.
+    /// Removes a vertical seam from the image,
+    /// diminishing its width by 1.
     pub fn remove_seam(&mut self) {
         let img = &self.carved;
         let seam = self.seam_finder.extract_seam(|p| energy_fn(img, p));

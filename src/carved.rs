@@ -1,12 +1,12 @@
+use image::{GenericImageView, ImageBuffer, Pixel};
+
 use crate::matrix::Matrix;
-use crate::max_pos;
 use crate::pos::Pos;
-use image::GenericImageView;
+use crate::{image_view_to_buffer, max_pos};
 
 /// An image with some vertical seams carved.
 /// If you want to save this image or otherwise manipulate it,
-/// you can convert it to a [ImageBuffer](image::ImageBuffer)
-/// using [image_view_to_buffer](crate::image_view_to_buffer)
+/// you can convert it to a [ImageBuffer](image::ImageBuffer).
 pub struct Carved<'a, IMG: GenericImageView> {
     img: &'a IMG,
     removed: u32,
@@ -34,6 +34,23 @@ impl<'a, IMG: GenericImageView> Carved<'a, IMG> {
         let mut pos = pos;
         pos.0 = self.pos_aliases[pos];
         pos
+    }
+}
+
+impl<'a, 'b, IMG: GenericImageView>
+    Into<ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>>>
+    for &'b Carved<'a, IMG>
+where
+    <IMG as GenericImageView>::Pixel: 'static,
+{
+    /// Creates a buffer storing the image modified image contents.
+    ///
+    /// Creating the buffer is expensive, but accessing image data from a buffer is then
+    /// faster than from [Carved](Carved) instance.
+    fn into(
+        self,
+    ) -> ImageBuffer<IMG::Pixel, Vec<<<IMG as GenericImageView>::Pixel as Pixel>::Subpixel>> {
+        image_view_to_buffer(self)
     }
 }
 
