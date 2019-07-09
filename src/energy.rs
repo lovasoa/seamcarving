@@ -26,8 +26,8 @@ fn square_diff_px<P: Pixel>(p1: P, p2: P) -> u32 {
 
 #[inline]
 fn square_diff<T: ToPrimitive>(a: T, b: T) -> u32 {
-    let a = a.to_u32().unwrap_or(u32::max_value());
-    let b = b.to_u32().unwrap_or(u32::max_value());
-    let diff = if a > b { a - b } else { b - a };
-    diff * diff
+    let a = a.to_i32().unwrap_or(i32::max_value());
+    let b = b.to_i32().unwrap_or(i32::max_value());
+    let diff = a - b;
+    (diff * diff) as u32
 }
