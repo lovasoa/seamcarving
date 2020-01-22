@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 
 export RUSTFLAGS="${RUSTFLAGS:''}";
@@ -8,12 +7,11 @@ if [[ -z "$ALLOW_WARNINGS" ]]; then
 fi
 
 if [[ "$TARGET" ]]; then
-    rustup target add $TARGET;
-else
-    TARGET=$(rustup target list | grep '(default)' | cut -d ' ' -f1)
+    rustup target add "$TARGET";
+    TARGET_FLAG="--target=$TARGET"
 fi
 
-cargo build --target="$TARGET"
+cargo build "$TARGET_FLAG"
 
 if [[ -z "$SKIP_TESTS" ]]; then
     cargo test;
