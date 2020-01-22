@@ -11,7 +11,7 @@ if [[ "$TARGET" ]]; then
     TARGET_FLAG="--target=$TARGET"
 fi
 
-cargo build "$TARGET_FLAG"
+cargo build $TARGET_FLAG
 
 if [[ -z "$SKIP_TESTS" ]]; then
     cargo test;
