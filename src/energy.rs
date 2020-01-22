@@ -16,7 +16,7 @@ pub(crate) fn energy_fn<IMG: GenericImageView>(img: &IMG, pos: Pos) -> u32 {
 
 fn square_diff_px<P: Pixel>(p1: P, p2: P) -> u32 {
     let (ch1, ch2) = (p1.channels(), p2.channels());
-    let count = <P as Pixel>::channel_count() as usize;
+    let count = <P as Pixel>::CHANNEL_COUNT as usize;
     let mut sum = 0;
     for i in 0..count {
         sum += square_diff(ch1[i], ch2[i]);
